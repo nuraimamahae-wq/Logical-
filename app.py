@@ -47,13 +47,10 @@ st.markdown("""
         padding: 15px;
         border-radius: 10px;
         margin-top: 10px;
+        margin-bottom: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
-
-# Initialize Session State
-if 'score' not in st.session_state:
-    st.session_state.score = 0
 
 # ---------------------------------------------------------
 # Sidebar Navigation
@@ -69,17 +66,12 @@ main_menu = st.sidebar.radio(
         "📕 บทที่ 4: การอ้างเหตุผล (Arguments)",
         "🟣 บทที่ 5: ประโยคเปิดและตัวบ่งปริมาณ",
         "📓 บทที่ 6: การอุปนัยและนิรนัย",
-        "💡 ตัวอย่าง 3 ข้อพร้อมเฉลยละเอียด",
-        "📝 แบบฝึกหัดและเฉลยท้ายบท",
-        "📐 สรุปสูตรและสมมูลทั้งหมด",
+        "📝 เฉลยแบบฝึกหัดท้ายบททั้งหมด",
+        "📐 สรุปสูตรรวมทั้งหมด",
         "⚡ เครื่องมือคำนวณอัจฉริยะ",
         "📚 เอกสารอ้างอิง"
     ]
 )
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 🏆 คะแนนสะสมของคุณ")
-st.sidebar.metric(label="คะแนนแบบฝึกหัด", value=f"{st.session_state.score} คะแนน")
 
 # ---------------------------------------------------------
 # 1. หน้าแรก
@@ -104,7 +96,7 @@ if main_menu == "🏠 หน้าแรก & ข้อมูลรายงา�
         st.markdown("""
         <div class="card-box">
             <h3>🎯 วัตถุประสงค์ของแอปพลิเคชัน</h3>
-            <p>แอปพลิเคชันนี้พัฒนาขึ้นเพื่อรวบรวมเนื้อหาทางตรรกศาสตร์เชิงคณิตศาสตร์แบบจัดเต็ม ทั้งทฤษฎี ตัวอย่างการพิสูจน์เชิงลึก พร้อมตัวอย่างและโจทย์ฝึกหัดพร้อมเฉลย เพื่อเสริมสร้างกระบวนการคิดวิเคราะห์และการให้เหตุผลที่ถูกต้อง[cite: 7]</p>
+            <p>แอปพลิเคชันนี้รวบรวมเนื้อหาตรรกศาสตร์เชิงคณิตศาสตร์ทั้ง 6 บทแบบเจาะลึก พร้อมตัวอย่าง 3 ข้อพร้อมเฉลยในแต่ละบท, โจทย์ฝึกหัด 2 ข้อ, และสรุปสูตรประจำบทเพื่อเสริมสร้างความเข้าใจที่สมบูรณ์[cite: 7, 8]</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -115,11 +107,31 @@ elif main_menu == "📘 บทที่ 1: ประพจน์และกา�
     st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #2563EB, #1D4ED8);">📘 บทที่ 1: บทนำตรรกศาสตร์เชิงคณิตศาสตร์</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="card-box">
-        <h3>📖 เนื้อหาและทฤษฎีสำคัญ</h3>
-        <p>ตรรกศาสตร์เชิงคณิตศาสตร์ศึกษาโครงสร้างรูปแบบของการให้เหตุผลที่สมเหตุสมผล <b>ประพจน์ (Proposition)</b> คือประโยคบอกเล่าหรือปฏิเสธที่มีค่าความจริงเป็นจริง (True) หรือเท็จ (True/False) อย่างใดอย่างหนึ่งเท่านั้น ประพจน์ย่อยมักแทนด้วยตัวA-Z เช่น p, q, r, s[cite: 10]</p>
-        <p><b>หลักการพิสูจน์เบื้องต้น:</b> การตรวจสอบความสมเหตุสมผลพิจารณาว่าข้อสรุปต้องเป็นจริงเสมอเมื่อเหตุทุกข้อเป็นจริง[cite: 10]</p>
+        <h3>📖 เนื้อหาและทฤษฎี (Definitions and Central Ideas)</h3>
+        <p>ตรรกศาสตร์เชิงคณิตศาสตร์ศึกษาโครงสร้างรูปแบบของการให้เหตุผลที่สมเหตุสมผล <b>ประพจน์ (Proposition)</b> คือประโยคบอกเล่าหรือปฏิเสธที่มีค่าความจริงเป็นจริง (True) หรือเท็จ (False) อย่างใดอย่างหนึ่ง ประพจน์เชิงเดี่ยวแทนด้วยตัวอักษร $p, q, r, s$ ส่วนประพจน์เชิงซ้อนสร้างขึ้นผ่านตัวเชื่อมทางตรรกศาสตร์[cite: 10]</p>
+        <p><b>หลักการพิสูจน์ (Syntax & Semantics):</b> การตรวจสอบความสมเหตุสมผลพิจารณาว่าข้อสรุปต้องเป็นจริงเสมอเมื่อเหตุทุกข้อเป็นจริง[cite: 10]</p>
+        
+        <h4>📐 สรุปสูตรประจำบทที่ 1</h4>
+        <ul>
+            <li><b>Modus Ponens:</b> $p, p \rightarrow q \vdash q$[cite: 10]</li>
+            <li><b>Modus Tollens:</b> $p \rightarrow q, \neg q \vdash \neg p$[cite: 14]</li>
+        </ul>
     </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown("### 💡 ตัวอย่าง 3 ข้อพร้อมเฉลย (บทที่ 1)")
+    st.markdown("<b>ตัวอย่าง 1.1:</b> จงพิจารณาว่าประโยค 'กรุงเทพมหานครเป็นเมืองหลวงของประเทศไทย' เป็นประพจน์หรือไม่ และมีค่าความจริงเป็นอย่างไร?")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> เป็นประพจน์ เพราะเป็นประโยคบอกเล่าที่มีค่าความจริงเป็น <b>จริง (True)</b>[cite: 10]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 1.2:</b> กำหนดให้ประพจน์ $p$ แทน 'ฝนตก' และ $q$ แทน 'ถนนเปียก' หากทราบว่า $p$ เป็นจริง และ $p \rightarrow q$ เป็นจริง จงหาค่าความจริงของ $q$")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> จากกฎ Modus Ponens ($p$ และ $p \rightarrow q$ สรุป $q$) จะได้ว่า $q$ มีค่าความจริงเป็น <b>จริง (True)</b>[cite: 10]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 1.3:</b> กำหนดให้เหตุคือ $p \rightarrow q$ และ $\neg q$ จงหาข้อสรุปตามกฎการให้เหตุผล")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> ใช้กฎ Modus Tollens จะสามารถสรุปผลได้ว่า <b>$\neg p$</b> (ไม่ใช่ $p$)[cite: 14]</div>', unsafe_allow_html=True)
+
+    st.markdown("### 📝 โจทย์ฝึกหัด 2 ข้อ (บทที่ 1)")
+    st.markdown("1. ประโยค 'โปรดปิดประตูหน้าต่าง' เป็นประพจน์ทางตรรกศาสตร์หรือไม่ เพราะเหตุใด?")
+    st.markdown("2. กำหนดเหตุ: $p \rightarrow r$ และ $p$ จงหาข้อสรุปที่สมเหตุสมผล")
 
 # ---------------------------------------------------------
 # 3. บทที่ 2
@@ -128,18 +140,30 @@ elif main_menu == "📗 บทที่ 2: ตัวเชื่อมและ�
     st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #059669, #047857);">📗 บทที่ 2: ตัวเชื่อมทางตรรกศาสตร์และตารางค่าความจริง</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="card-box">
-        <h3>📖 เนื้อหาและทฤษฎีสำคัญ</h3>
-        <p>ตัวเชื่อมทางตรรกศาสตร์หลักประกอบด้วย:</p>
+        <h3>📖 เนื้อหาและทฤษฎี (Definitions and Central Ideas)</h3>
+        <p>ตัวเชื่อมทางตรรกศาสตร์หลัก: นิเสธ ($\neg$), และ ($\wedge$), หรือ ($\vee$), การimplie ($\rightarrow$), และสมมูล ($\leftrightarrow$) ตารางค่าความจริงของประพจน์ที่มี $n$ ตัวแปรจะมีทั้งหมด $2^n$ แถว[cite: 12]</p>
+        
+        <h4>📐 สรุปสูตรประจำบทที่ 2</h4>
         <ul>
-            <li><b>นิเสธ (Negation $\\neg$):</b> กลับค่าความจริงของประพจน์[cite: 12]</li>
-            <li><b>และ (Conjunction $\\wedge$):</b> เป็นจริงเฉพาะกรณีที่ประพจน์ย่อยเป็นจริงทั้งคู่[cite: 12]</li>
-            <li><b>หรือ (Disjunction $\\vee$):</b> เป็นเท็จเฉพาะกรณีที่ประพจน์ย่อยเป็นเท็จทั้งคู่[cite: 12]</li>
-            <li><b>การimplie (Implication $\\rightarrow$):</b> เป็นเท็จกรณีเดียวคือ หน้าจริง หลังเท็จ[cite: 12]</li>
-            <li><b>สมมูล (Biconditional $\\leftrightarrow$):</b> เป็นจริงเมื่อประพจน์ทั้งสองมีค่าความจริงเหมือนกัน[cite: 12]</li>
+            <li><b>Implication Equivalence:</b> $A \rightarrow B \equiv \neg A \vee B$[cite: 12]</li>
+            <li><b>De Morgan's Laws:</b> $\neg(A \wedge B) \equiv \neg A \vee \neg B$ และ $\neg(A \vee B) \equiv \neg A \wedge \neg B$[cite: 12]</li>
         </ul>
-        <p>ตารางค่าความจริงสำหรับประพจน์ $n$ ตัวจะมีทั้งหมด $2^n$ แถว[cite: 12]</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown("### 💡 ตัวอย่าง 3 ข้อพร้อมเฉลย (บทที่ 2)")
+    st.markdown("<b>ตัวอย่าง 2.1:</b> กำหนดให้ $p$ เป็นจริง และ $q$ เป็นเท็จ จงหาค่าความจริงของ $p \wedge q$")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> ตัวเชื่อม และ ($\wedge$) จะเป็นจริงก็ต่อเมื่อประพจน์ย่อยเป็นจริงทั้งคู่ ดังนั้น $T \wedge F \equiv$ <b>เท็จ (False)</b>[cite: 12]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 2.2:</b> จงแปลงประพจน์ $p \rightarrow q$ ให้เป็นรูปdisjunction (หรือ)")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> ใช้สูตรสมมูลการimplie จะได้ $\neg p \vee q$[cite: 12]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 2.3:</b> ประพจน์ $\neg(p \wedge q)$ สมมูลกับประพจน์ใดตามกฎเดอมอร์แกน")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> สมมูลกับ $\neg p \vee \neg q$[cite: 12]</div>', unsafe_allow_html=True)
+
+    st.markdown("### 📝 โจทย์ฝึกหัด 2 ข้อ (บทที่ 2)")
+    st.markdown("1. จงสร้างตารางค่าความจริงของประพจน์ $p \vee (q \wedge \neg p)$")
+    st.markdown("2. จงหาประพจน์ที่สมมูลกับ $\neg(p \vee q)$")
 
 # ---------------------------------------------------------
 # 4. บทที่ 3
@@ -148,11 +172,30 @@ elif main_menu == "📙 บทที่ 3: สัจนิรันดร์ (Ta
     st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #D97706, #B45309);">📙 บทที่ 3: สัจนิรันดร์ (Tautologies)</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="card-box">
-        <h3>📖 เนื้อหาและทฤษฎีสำคัญ</h3>
-        <p><b>สัจนิรันดร์ (Tautology)</b> คือประพจน์ที่มีค่าความจริงเป็น <b>จริง (T) ทุกกรณี</b> ไม่ว่าประพจน์ย่อยจะมีค่าความจริงเป็นอย่างไร[cite: 16]</p>
-        <p><b>วิธีการตรวจสอบ:</b> สามารถสร้างตารางค่าความจริงจนครบทุกกรณี หรือใช้วิธีสมมติให้ประพจน์เป็นเท็จเพื่อหาข้อขัดแย้ง (Countervaluation) หากเกิดข้อขัดแย้งแสดงว่าเป็นสัจนิรันดร์[cite: 16]</p>
+        <h3>📖 เนื้อหาและทฤษฎี (Definitions and Central Ideas)</h3>
+        <p><b>สัจนิรันดร์ (Tautology)</b> คือประพจน์ที่มีค่าความจริงเป็น <b>จริง (True) ทุกกรณี</b> ส่วนข้อขัดแย้ง (Contradiction) เป็นเท็จทุกกรณี ตรวจสอบได้โดยการสร้างตารางค่าความจริงหรือใช้วิธีหาข้อขัดแย้ง[cite: 16]</p>
+        
+        <h4>📐 สรุปสูตรประจำบทที่ 3</h4>
+        <ul>
+            <li><b>Law of Excluded Middle:</b> $p \vee \neg p$ เป็นสัจนิรันดร์ हमेशा</li>
+            <li><b>Deduction Theorem:</b> ประพจน์ $A_1, ..., A_n \models C$ สมมูลกับการเป็นสัจนิรันดร์ของ $(A_1 \wedge ... \wedge A_n) \rightarrow C$[cite: 16]</li>
+        </ul>
     </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown("### 💡 ตัวอย่าง 3 ข้อพร้อมเฉลย (บทที่ 3)")
+    st.markdown("<b>ตัวอย่าง 3.1:</b> จงตรวจสอบว่าประพจน์ $p \vee \neg p$ เป็นสัจนิรันดร์หรือไม่")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> เมื่อสร้างตารางค่าความจริง จะได้ผลลัพธ์เป็น T ทุกแถว ดังนั้น <b>เป็นสัจนิรันดร์</b></div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 3.2:</b> จงตรวจสอบว่าประพจน์ $p \rightarrow (p \vee q)$ เป็นสัจนิรันดร์หรือไม่")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> สมมติให้เป็นเท็จ จะได้ $p \equiv T$ และ $p \vee q \equiv F$ ซึ่งทำให้ $p \equiv F$ เกิดข้อขัดแย้ง ดังนั้น <b>เป็นสัจนิรันดร์</b></div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 3.3:</b> ประพจน์ $p \wedge \neg p$ เป็นสัจนิรันดร์หรือไม่")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> มีค่าความจริงเป็นเท็จทุกกรณี จึงเป็นข้อขัดแย้ง <b>ไม่เป็นสัจนิรันดร์</b>[cite: 16]</div>', unsafe_allow_html=True)
+
+    st.markdown("### 📝 โจทย์ฝึกหัด 2 ข้อ (บทที่ 3)")
+    st.markdown("1. จงตรวจสอบว่าประพจน์ $(p \wedge q) \rightarrow p$ เป็นสัจนิรันดร์หรือไม่")
+    st.markdown("2. จงตรวจสอบว่าประพจน์ $p \rightarrow q$ เป็นสัจนิรันดร์หรือไม่")
 
 # ---------------------------------------------------------
 # 5. บทที่ 4
@@ -161,11 +204,30 @@ elif main_menu == "📕 บทที่ 4: การอ้างเหตุผ�
     st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #DC2626, #B91C1C);">📕 บทที่ 4: การอ้างเหตุผลและความสมเหตุสมผล</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="card-box">
-        <h3>📖 เนื้อหาและทฤษฎีสำคัญ</h3>
-        <p>การอ้างเหตุผลประกอบด้วย <b>เหตุ (Premises)</b> และ <b>ผลสรุป (Conclusion)</b> การอ้างเหตุผลจะ<b>สมเหตุสมผล (Valid)</b> ก็ต่อเมื่อกรณีที่เหตุทุกข้อเป็นจริง ผลสรุปต้องเป็นจริงด้วย[cite: 22]</p>
-        <p><b>กฎสำคัญ:</b> Modus Ponens, Modus Tollens, Hypothetical Syllogism และ Disjunctive Syllogism[cite: 22]</p>
+        <h3>📖 เนื้อหาและทฤษฎี (Definitions and Central Ideas)</h3>
+        <p>การอ้างเหตุผลประกอบด้วยเหตุและผลสรุป จะ<b>สมเหตุสมผล (Valid)</b> เมื่อกรณีที่เหตุทุกข้อเป็นจริง ผลสรุปต้องเป็นจริงด้วย[cite: 22]</p>
+        
+        <h4>📐 สรุปสูตรประจำบทที่ 4</h4>
+        <ul>
+            <li><b>Hypothetical Syllogism:</b> $A \rightarrow B, B \rightarrow C \vdash A \rightarrow C$[cite: 22]</li>
+            <li><b>Constructive Dilemma:</b> $(p \rightarrow r) \wedge (q \rightarrow r) \wedge (p \vee q) \vdash r$[cite: 17]</li>
+        </ul>
     </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown("### 💡 ตัวอย่าง 3 ข้อพร้อมเฉลย (บทที่ 4)")
+    st.markdown("<b>ตัวอย่าง 4.1:</b> เหตุ $p \rightarrow q$ และ $q \rightarrow r$ ผลสรุป $p \rightarrow r$ สมเหตุสมผลหรือไม่")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> สมเหตุสมผลตามกฎ Hypothetical Syllogism[cite: 22]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 4.2:</b> เหตุ $p \rightarrow q$ และ $q$ ผลสรุป $p$ สมเหตุสมผลหรือไม่")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> ไม่สมเหตุสมผล (เข้าข่าย Fallacy: Affirming the consequent)[cite: 22]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 4.3:</b> เหตุ $p \vee q, \neg p$ ผลสรุป $q$ สมเหตุสมผลหรือไม่")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> สมเหตุสมผลตามกฎ Disjunctive Syllogism[cite: 14]</div>', unsafe_allow_html=True)
+
+    st.markdown("### 📝 โจทย์ฝึกหัด 2 ข้อ (บทที่ 4)")
+    st.markdown("1. ตรวจสอบความสมเหตุสมผลของเหตุ: $p \rightarrow q, \neg q$ ข้อสรุป: $\neg p$")
+    st.markdown("2. ตรวจสอบความสมเหตุสมผลของเหตุ: $p \vee q, p \rightarrow r, q \rightarrow s$ ข้อสรุป: $r \vee s$")
 
 # ---------------------------------------------------------
 # 6. บทที่ 5
@@ -174,15 +236,30 @@ elif main_menu == "🟣 บทที่ 5: ประโยคเปิดแล�
     st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #7C3AED, #6D28D9);">🟣 บทที่ 5: ประโยคเปิดและตัวบ่งปริมาณ (Quantifiers)</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="card-box">
-        <h3>📖 เนื้อหาและทฤษฎีสำคัญ</h3>
-        <p><b>ประโยคเปิด $P(x)$</b> คือประโยคที่มีตัวแปรและจะยังบอกค่าความจริงไม่ได้จนกว่าจะแทนค่าหรือมีตัวบ่งปริมาณ[cite: 26]</p>
+        <h3>📖 เนื้อหาและทฤษฎี (Definitions and Central Ideas)</h3>
+        <p>ตัวบ่งปริมาณประกอบด้วย สำหรับทุกตัว ($\forall x$) และสำหรับบางตัว ($\exists x$) ลำดับของตัวบ่งปริมาณมีความสำคัญมาก[cite: 26]</p>
+        
+        <h4>📐 สรุปสูตรประจำบทที่ 5</h4>
         <ul>
-            <li><b>สำหรับทุกตัว ($\\forall x$):</b> เป็นจริงเมื่อทุกสมาชิกในเอกภพสัมพัทธ์ทำให้ $P(x)$ เป็นจริง[cite: 26]</li>
-            <li><b>สำหรับบางตัว ($\\exists x$):</b> เป็นจริงเมื่อมีสมาชิกอย่างน้อยหนึ่งตัวทำให้ $P(x)$ เป็นจริง[cite: 26]</li>
+            <li><b>Quantifier Negation 1:</b> $\neg \forall x P(x) \equiv \exists x \neg P(x)$[cite: 26]</li>
+            <li><b>Quantifier Negation 2:</b> $\neg \exists x P(x) \equiv \forall x \neg P(x)$[cite: 26]</li>
         </ul>
-        <p><b>กฎนิเสธ:</b> $\\neg \\forall x P(x) \\equiv \\exists x \\neg P(x)$ และ $\\neg \\exists x P(x) \\equiv \\forall x \\neg P(x)$[cite: 26]</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown("### 💡 ตัวอย่าง 3 ข้อพร้อมเฉลย (บทที่ 5)")
+    st.markdown("<b>ตัวอย่าง 5.1:</b> จงหานิเสธของ $\forall x P(x)$")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> $\exists x \neg P(x)$[cite: 26]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 5.2:</b> จงหานิเสธของ $\exists x \forall y Q(x, y)$")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> $\forall x \exists y \neg Q(x, y)$[cite: 26]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 5.3:</b> พิจารณาเอกภพสัมพัทธ์เป็นจำนวนเต็ม ข้อความ $\forall x \exists y (x < y)$ เป็นจริงหรือเท็จ")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> เป็นจริง เพราะสำหรับทุกจำนวนเต็ม $x$ สามารถเลือก $y = x + 1$ ได้เสมอ[cite: 26]</div>', unsafe_allow_html=True)
+
+    st.markdown("### 📝 โจทย์ฝึกหัด 2 ข้อ (บทที่ 5)")
+    st.markdown("1. จงหานิเสธของข้อความ: $\forall x (P(x) \rightarrow Q(x))$")
+    st.markdown("2. อธิบายว่าเหตุใดลำดับของตัวบ่งปริมาณใน $\forall x \exists y (x < y)$ จึงไม่สมมูลกับ $\exists y \forall x (x < y)$ บนจำนวนเต็ม")
 
 # ---------------------------------------------------------
 # 7. บทที่ 6
@@ -191,159 +268,123 @@ elif main_menu == "📓 บทที่ 6: การอุปนัยและ�
     st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #0EA5E9, #0284C7);">📓 บทที่ 6: การอุปนัยและนิรนัย (Inductive & Deductive)</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="card-box">
-        <h3>📖 เนื้อหาและทฤษฎีสำคัญ</h3>
-        <p><b>การให้เหตุผลแบบอุปนัย (Inductive Reasoning)</b> ใช้ข้อสังเกตจากกรณีเฉพาะเพื่อสรุปเป็นกฎทั่วไป ส่วน<b>นิรนัย (Deductive Reasoning)</b> เป็นการอสรุปผลตามกฎเกณฑ์ตรรกะที่แน่นอน[cite: 29]</p>
-        <p><b>การอุปนัยเชิงคณิตศาสตร์ (Mathematical Induction):</b> วิธีพิสูจน์สำหรับจำนวนเต็มบวก $n$ ประกอบด้วย 2 ขั้นตอนหลัก คือ พิสูจน์ว่าจริงที่ $n=1$ (Base case) และสมมติว่าจริงที่ $n=k$ แล้วพิสูจน์ให้ ัเห็นว่าจริงที่ $n=k+1$[cite: 29]</p>
+        <h3>📖 เนื้อหาและทฤษฎี (Definitions and Central Ideas)</h3>
+        <p>การอุปนัยสรุปจากกรณีเฉพาะ ส่วนนิรนัยสรุปตามกฎตรรกะ การอุปนัยเชิงคณิตศาสตร์ประกอบด้วย Base case ($n=1$) และ Inductive step ($P(k) \rightarrow P(k+1)$)[cite: 29]</p>
+        
+        <h4>📐 สรุปสูตรประจำบทที่ 6</h4>
+        <ul>
+            <li><b>Sum of First $n$ Cubes:</b> $1^3 + 2^3 + \dots + n^3 = [\frac{n(n+1)}{2}]^2$[cite: 34]</li>
+            <li><b>Sum of First $n$ Odd Integers:</b> $1 + 3 + \dots + (2n-1) = n^2$[cite: 29]</li>
+        </ul>
     </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown("### 💡 ตัวอย่าง 3 ข้อพร้อมเฉลย (บทที่ 6)")
+    st.markdown("<b>ตัวอย่าง 6.1:</b> จงตรวจสอบสูตรผลบวกกำลังสามเมื่อ $n=2$ จากสูตร $1^3 + 2^3 = [\frac{n(n+1)}{2}]^2$")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> ฝั่งซ้าย = $1 + 8 = 9$ , ฝั่งขวา = $[\frac{2(3)}{2}]^2 = 3^2 = 9$ (เท่ากันและเป็นจริง)[cite: 34]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 6.2:</b> ขั้นตอนแรกของการอุปนัยเชิงคณิตศาสตร์คืออะไร?")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> การพิสูจน์ขั้นฐาน (Base Case) ว่าเป็นจริงเมื่อ $n=1$[cite: 29]</div>', unsafe_allow_html=True)
+    
+    st.markdown("<b>ตัวอย่าง 6.3:</b> สมมติฐานในการอุปนัย (Inductive Hypothesis) คือข้อสมมติใด?")
+    st.markdown('<div class="solution-box"><b>เฉลย:</b> สมมติให้ประพจน์เป็นจริงเมื่อ $n=k$ เพื่อนำไปพิสูจน์ต่อที่ $n=k+1$[cite: 29, 34]</div>', unsafe_allow_html=True)
+
+    st.markdown("### 📝 โจทย์ฝึกหัด 2 ข้อ (บทที่ 6)")
+    st.markdown("1. จงใช้การอุปนัยเชิงคณิตศาสตร์พิสูจน์ว่า $1 + 3 + \dots + (2n-1) = n^2$ สำหรับทุก $n \ge 1$")
+    st.markdown("2. จงอธิบายความแตกต่างระหว่างการให้เหตุผลแบบอุปนัยและแบบนิรนัย")
 
 # ---------------------------------------------------------
-# 8. ตัวอย่าง 3 ข้อพร้อมเฉลยละเอียด
+# 8. เฉลยแบบฝึกหัดท้ายบททั้งหมด
 # ---------------------------------------------------------
-elif main_menu == "💡 ตัวอย่าง 3 ข้อพร้อมเฉลยละเอียด":
-    st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #10B981, #059669);">💡 ตัวอย่างโจทย์พร้อมวิธีทำอย่างละเอียด</div>', unsafe_allow_html=True)
+elif main_menu == "📝 เฉลยแบบฝึกหัดท้ายบททั้งหมด":
+    st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #4F46E5, #3B82F6);">📝 เฉลยแบบฝึกหัดท้ายบททั้งหมด (ครบทั้ง 6 บท)</div>', unsafe_allow_html=True)
     
-    st.markdown("### ตัวอย่างที่ 1: การตรวจสอบสัจนิรันดร์")
-    st.markdown("จงตรวจสอบว่าประพจน์ $[(p \\wedge q) \\rightarrow r] \\leftrightarrow [p \\rightarrow (q \\rightarrow r)]$ เป็นสัจนิรันดร์หรือไม่[cite: 21]")
-    with st.container():
+    with st.expander("👉 คลิกเพื่อดูเฉลย บทที่ 1"):
         st.markdown("""
-        <div class="solution-box">
-            <b>วิธีทำ (พิสูจน์โดยหาข้อขัดแย้ง):</b><br>
-            1. สมมติให้ประพจน์หลักมีค่าความจริงเป็น <b>เท็จ ($\\equiv F$)</b>[cite: 21]<br>
-            2. เนื่องจากเชื่อมด้วย $\\leftrightarrow$ และเป็น F แสดงว่าประพจน์ซ้ายและขวาต้องมีค่าความจริง<b>ตรงข้ามกัน</b> (กรณีหนึ่งเป็น T อีกกรณีเป็น F)[cite: 21]<br>
-            3. หากสมมติกรณีที่ฝั่งซ้ายเป็น F และฝั่งขวาเป็น T จะพบว่า เมื่อแทนค่า $p \\equiv T, q \\equiv T, r \\equiv F$ จะเกิดข้อขัดแย้งกับเงื่อนไขเริ่มต้น[cite: 21]<br>
-            4. ทำซ้ำในทุกกรณี จะพบว่าเกิดข้อขัดแย้งทั้งหมด ดังนั้นการสมมติให้เป็นเท็จจึงเป็นไปไม่ได้<br>
-            <b>สรุป:</b> ประพจน์นี้<b>เป็นสัจนิรันดร์ (Tautology)</b>[cite: 21]
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("### ตัวอย่างที่ 2: การตรวจสอบความสมเหตุสมผลของการอ้างเหตุผล")
-    st.markdown("กำหนดเหตุ: 1) $p \\rightarrow (q \\vee r)$ , 2) $q \\rightarrow \\neg s$ , 3) $s$ <br>จงตรวจสอบว่าข้อสรุป $\\therefore p \\rightarrow r$ สมเหตุสมผลหรือไม่[cite: 35]", unsafe_allow_html=True)
-    with st.container():
+        * **ข้อ 1:** ไม่เป็นประพจน์ เพราะเป็นประโยคคำสั่ง (Imperative sentence) ซึ่งไม่มีค่าความจริงเป็นจริงหรือเท็จ
+        * **ข้อ 2:** จากเหตุ $p \rightarrow r$ และ $p$ สามารถสรุปผลเป็น **$r$** ได้ตามกฎ Modus Ponens[cite: 10]
+        """)
+        
+    with st.expander("👉 คลิกเพื่อดูเฉลย บทที่ 2"):
         st.markdown("""
-        <div class="solution-box">
-            <b>วิธีทำ:</b><br>
-            1. สมมติให้การอ้างเหตุผล<b>ไม่สมเหตุสมผล</b> กล่าวคือ เหตุทุกข้อเป็น <b>จริง (T)</b> แต่ข้อสรุปเป็น <b>เท็จ (F)</b>[cite: 35]<br>
-            2. จากข้อสรุป $p \\rightarrow r \\equiv F$ จะได้บังคับว่า $p \\equiv T$ และ $r \\equiv F$[cite: 35]<br>
-            3. นำ $p \\equiv T$ ไปแทนในเหตุที่ 1 $[p \\rightarrow (q \\vee r)] \\equiv T$ จะได้ $T \\rightarrow (q \\vee F) \\equiv T$ ดังนั้น $q$ ต้องเป็น <b>เท็จ ($F$)</b>[cite: 36]<br>
-            4. นำ $q \\equiv F$ ไปแทนในเหตุที่ 2 $[q \\rightarrow \\neg s] \\equiv T$ จะได้ $F \\rightarrow \\neg s \\equiv T$ ซึ่งสอดคล้อง[cite: 35]<br>
-            5. ตรวจสอบเหตุที่ 3 คือ $s \\equiv T$ ซึ่งทำให้ $\\neg s \\equiv F$ จะเกิดข้อขัดแย้งกับการสมมติ<br>
-            <b>สรุป:</b> การสมมติทำให้เกิดข้อขัดแย้ง ดังนั้นการอ้างเหตุผลนี้<b>สมเหตุสมผล (Valid)</b>[cite: 36]
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("### ตัวอย่างที่ 3: การพิสูจน์ด้วยอุปนัยเชิงคณิตศาสตร์")
-    st.markdown("จงพิสูจน์ว่า $1^3 + 2^3 + 3^3 + \\dots + n^3 = [\\frac{n(n+1)}{2}]^2$ สำหรับทุกจำนวนเต็มบวก $n \\ge 1$[cite: 34]")
-    with st.container():
+        * **ข้อ 1:** ตารางค่าความจริงของ $p \vee (q \wedge \neg p)$ จะให้ผลลัพธ์สมมูลกับ $p \vee q$
+        * **ข้อ 2:** ตามกฎเดอมอร์แกน $\neg(p \vee q) \equiv$ **$\neg p \wedge \neg q$**[cite: 12]
+        """)
+        
+    with st.expander("👉 คลิกเพื่อดูเฉลย บทที่ 3"):
         st.markdown("""
-        <div class="solution-box">
-            <b>วิธีทำ:</b><br>
-            1. <b>ขั้นฐาน (Base Case):</b> เมื่อ $n = 1$<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;ฝั่งซ้าย = $1^3 = 1$ , ฝั่งขวา = $[\\frac{1(1+1)}{2}]^2 = 1^2 = 1$ (จริง)<br>
-            2. <b>ขั้นอุปนัย (Inductive Step):</b> สมมติว่าสูตรเป็นจริงเมื่อ $n = k$ นั่นคือ $1^3 + \\dots + k^3 = [\\frac{k(k+1)}{2}]^2$[cite: 34]<br>
-            3. พิสูจน์ว่าจริงสำหรับ $n = k+1$ โดยบวกพจน์ $(k+1)^3$ ทั้งสองข้าง แล้วจัดรูปทางพีชคณิตจะได้ผลลัพธ์เป็น $[\\frac{(k+1)(k+2)}{2}]^2$<br>
-            <b>สรุป:</b> สมการนี้เป็นจริงสำหรับทุกจำนวนเต็มบวก $n \\ge 1$[cite: 34]
-        </div>
-        """, unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# 9. แบบฝึกหัดและเฉลยท้ายบท
-# ---------------------------------------------------------
-elif main_menu == "📝 แบบฝึกหัดและเฉลยท้ายบท":
-    st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #4F46E5, #3B82F6);">📝 แบบฝึกหัดทดสอบความรู้พร้อมเฉลยท้ายสุด</div>', unsafe_allow_html=True)
-    
-    st.markdown("### 📋 โจทย์ข้อที่ 1")
-    st.markdown("กำหนดให้ $p$ และ $q$ เป็นประพจน์ที่มีค่าความจริงเป็น **จริง (True)** และ $r$ มีค่าความจริงเป็น **เท็จ (False)** จงหาค่าความจริงของประพจน์: $[(p \\wedge \\neg q) \\vee r] \\rightarrow p$")
-    
-    ans_q1 = st.radio("เลือกคำตอบข้อ 1:", ["จริง (True)", "เท็จ (False)"], key="ex_q1")
-    
-    st.markdown("---")
-    st.markdown("### 📋 โจทย์ข้อที่ 2")
-    st.markdown("จงพิจารณาว่าข้อความใดต่อไปนี้เป็น **นิเสธ (Negation)** ที่ถูกต้องของประพจน์ $\\forall x \\exists y (x + y > 0)$")
-    
-    ans_q2 = st.radio("เลือกคำตอบข้อ 2:", [
-        "$\\exists x \\forall y (x + y \\le 0)$",
-        "$\\forall x \\forall y (x + y \\le 0)$",
-        "$\\exists x \\exists y (x + y > 0)$"
-    ], key="ex_q2")
-
-    if st.button("ส่งคำตอบแบบฝึกหัดทั้งหมด"):
-        score_count = 0
-        if ans_q1 == "จริง (True)":
-            score_count += 1
-        if ans_q2 == "$\\exists x \\forall y (x + y \\le 0)$":
-            score_count += 1
-        st.session_state.score = score_count
-        st.success(f"🎉 คุณทำคะแนนได้ {score_count} / 2 คะแนน! เลื่อนลงมาดูเฉลยละเอียดด้านล่างได้เลยครับ")
-
-    st.markdown("---")
-    st.markdown("## 🔑 เฉลยแบบฝึกหัดท้ายบท (ให้อ่านหลังทำเสร็จ)")
-    with st.expander("👉 คลิกเพื่อดูเฉลยและวิธีทำอย่างละเอียด"):
+        * **ข้อ 1:** $(p \wedge q) \rightarrow p$ **เป็นสัจนิรันดร์** เพราะหากสมมติให้เป็นเท็จ จะได้หน้าจริงหลังเท็จ ($p \wedge q \equiv T$ และ $p \equiv F$) ซึ่งทำให้ $p$ เป็นจริงและเท็จพร้อมกัน เกิดข้อขัดแย้ง
+        * **ข้อ 2:** $p \rightarrow q$ **ไม่เป็นสัจนิรันดร์** (เป็นแบบสมนัย/คอนจังก์ชันธรรมดา) เพราะเป็นเท็จเมื่อ $p$ เป็นจริงและ $q$ เป็นเท็จ[cite: 12]
+        """)
+        
+    with st.expander("👉 คลิกเพื่อดูเฉลย บทที่ 4"):
         st.markdown("""
-        ### เฉลยโจทย์ข้อที่ 1:
-        * **โจทย์:** $[(p \\wedge \\neg q) \\vee r] \\rightarrow p$ โดยที่ $p \\equiv T, q \\equiv T, r \\equiv F$
-        * **วิธีทำ:**
-          1. แทนค่า $\\neg q \\equiv \\neg T \\equiv F$
-          2. พิจารณาวงเล็บแรก $(p \\wedge \\neg q) \\equiv (T \\wedge F) \\equiv F$
-          3. พิจารณาเชื่อมต่อด้วย $\\vee r$: $(F \\vee F) \\equiv F$
-          4. นำไปแทนในประพจน์หลัก: $F \\rightarrow T$ ซึ่งมีค่าความจริงเป็น **จริง (True)**
-        * **เฉลย:** **จริง (True)**
-
-        ---
-
-        ### เฉลยโจทย์ข้อที่ 2:
-        * **โจทย์:** นิเสธของ $\\forall x \\exists y (x + y > 0)$
-        * **วิธีทำ:** 
-          1. ตามกฎการกระจายนิเสธของตัวบ่งปริมาณ: $\\neg \\forall x P(x) \\equiv \\exists x \\neg P(x)$
-          2. นิเสธของ $\\exists y$ จะเปลี่ยนเป็น $\\forall y$
-          3. นิเสธของเครื่องหมาย $>$ คือ $\\le$
-          4. ดังนั้นจะได้ $\\exists x \\forall y (x + y \\le 0)$
-        * **เฉลย:** **$\\exists x \\forall y (x + y \\le 0)$**
+        * **ข้อ 1:** สมเหตุสมผลตามกฎ Modus Tollens[cite: 14]
+        * **ข้อ 2:** สมเหตุสมผลตามกฎ Constructive Dilemma[cite: 17]
+        """)
+        
+    with st.expander("👉 คลิกเพื่อดูเฉลย บทที่ 5"):
+        st.markdown("""
+        * **ข้อ 1:** $\exists x (P(x) \wedge \neg Q(x))$ (เนื่องจากนิเสธของ $A \rightarrow B$ คือ $A \wedge \neg B$)
+        * **ข้อ 2:** เพราะ $\forall x \exists y (x < y)$ หมายถึงทุกจำนวนมีตัวที่มากกว่า ซึ่งเป็นจริง แต่ $\exists y \forall x (x < y)$ หมายถึงมีจำนวนเต็มตัวหนึ่งที่มากกว่าทุกจำนวน ซึ่งไม่มีอยู่จริงบนจำนวนเต็ม[cite: 26]
+        """)
+        
+    with st.expander("👉 คลิกเพื่อดูเฉลย บทที่ 6"):
+        st.markdown("""
+        * **ข้อ 1:** พิสูจน์ $n=1$ ได้ $1 = 1^2$ (จริง) สมมติจริงที่ $k$ แล้วพิสูจน์ที่ $k+1$ จะได้ผลรวมเป็น $(k+1)^2$ ตามหลักอุปนัย[cite: 29]
+        * **ข้อ 2:** อุปนัยเป็นการสรุปจากกรณีเฉพาะไปสู่ทั่วไป ส่วนนิรนัยเป็นการอ้างผลตามกฎตรรกะที่แน่นอนตายตัว[cite: 29]
         """)
 
 # ---------------------------------------------------------
-# 10. สรุปสูตรและสมมูลทั้งหมด
+# 9. สรุปสูตรรวมทั้งหมด
 # ---------------------------------------------------------
-elif main_menu == "📐 สรุปสูตรและสมมูลทั้งหมด":
-    st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #9333EA, #C084FC);">📐 สรุปสูตรและกฎสมมูลทางตรรกศาสตร์</div>', unsafe_allow_html=True)
+elif main_menu == "📐 สรุปสูตรรวมทั้งหมด":
+    st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #9333EA, #C084FC);">📐 สรุปสูตรและกฎทางตรรกศาสตร์ทั้งหมด (รวมทุกบท)</div>', unsafe_allow_html=True)
     
     st.markdown("""
     <div class="card-box">
-        <h3>📋 กฎสมมูลที่สำคัญ (Logical Equivalences)</h3>
+        <h3>📋 1. กฎและสมมูลสำคัญทางตรรกศาสตร์</h3>
         <ul>
-            <li><b>กฎการเปลี่ยนรูป Implication:</b> $A \\rightarrow B \\equiv \\neg A \\vee B$[cite: 12]</li>
-            <li><b>กฎเดอมอร์แกน (De Morgan's Laws):</b> 
-                <br>• $\\neg(A \\wedge B) \\equiv \\neg A \\vee \\neg B$[cite: 12]
-                <br>• $\\neg(A \\vee B) \\equiv \\neg A \\wedge \\neg B$[cite: 12]
+            <li><b>การแปลง Implication:</b> $A \rightarrow B \equiv \neg A \vee B$[cite: 12]</li>
+            <li><b>De Morgan's Laws:</b> 
+                <br>• $\neg(A \wedge B) \equiv \neg A \vee \neg B$[cite: 12]
+                <br>• $\neg(A \vee B) \equiv \neg A \wedge \neg B$[cite: 12]
             </li>
-            <li><b>กฎนิเสธซ้อน (Double Negation):</b> $\\neg(\\neg A) \\equiv A$</li>
-            <li><b>กฎการสลับที่ (Commutative Laws):</b> $A \\vee B \\equiv B \\vee A$ และ $A \\wedge B \\equiv B \\wedge A$</li>
-            <li><b>กฎการแจกแจง (Distributive Laws):</b> $A \\vee (B \\wedge C) \\equiv (A \\vee B) \\wedge (A \\vee C)$</li>
+            <li><b>Double Negation:</b> $\neg(\neg A) \equiv A$</li>
+            <li><b>Law of Excluded Middle:</b> $p \vee \neg p \equiv T$</li>
         </ul>
         
-        <h3>📋 กฎนิเสธตัวบ่งปริมาณ (Quantifier Negation)</h3>
+        <h3>📋 2. กฎการอ้างเหตุผลหลัก (Inference Rules)</h3>
         <ul>
-            <li>$\\neg \\forall x P(x) \\equiv \\exists x \\neg P(x)$[cite: 26]</li>
-            <li>$\\neg \\exists x P(x) \\equiv \\forall x \\neg P(x)$[cite: 26]</li>
+            <li><b>Modus Ponens:</b> $p, p \rightarrow q \vdash q$[cite: 10]</li>
+            <li><b>Modus Tollens:</b> $p \rightarrow q, \neg q \vdash \neg p$[cite: 14]</li>
+            <li><b>Hypothetical Syllogism:</b> $p \rightarrow q, q \rightarrow r \vdash p \rightarrow r$[cite: 22]</li>
+            <li><b>Disjunctive Syllogism:</b> $p \vee q, \neg p \vdash q$[cite: 14]</li>
+            <li><b>Constructive Dilemma:</b> $(p \rightarrow r) \wedge (q \rightarrow r) \wedge (p \vee q) \vdash r$[cite: 17]</li>
         </ul>
-        
-        <h3>📋 กฎการอ้างเหตุผลสำคัญ (Valid Inference Rules)</h3>
+
+        <h3>📋 3. กฎตัวบ่งปริมาณ (Quantifier Rules)</h3>
         <ul>
-            <li><b>Modus Ponens:</b> $A \\rightarrow B, A \\vdash B$[cite: 22]</li>
-            <li><b>Modus Tollens:</b> $A \\rightarrow B, \\neg B \\vdash \\neg A$[cite: 22]</li>
-            <li><b>Hypothetical Syllogism:</b> $A \\rightarrow B, B \\rightarrow C \\vdash A \\rightarrow C$[cite: 22]</li>
+            <li>$\neg \forall x P(x) \equiv \exists x \neg P(x)$[cite: 26]</li>
+            <li>$\neg \exists x P(x) \equiv \forall x \neg P(x)$[cite: 26]</li>
+        </ul>
+
+        <h3>📋 4. สูตรการอุปนัยเชิงคณิตศาสตร์ (Mathematical Induction)</h3>
+        <ul>
+            <li><b>ผลบวกเลขคี่:</b> $1 + 3 + \dots + (2n-1) = n^2$[cite: 29]</li>
+            <li><b>ผลบวกกำลังสาม:</b> $1^3 + 2^3 + \dots + n^3 = [\frac{n(n+1)}{2}]^2$[cite: 34]</li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 11. เครื่องมือคำนวณอัจฉริยะ
+# 10. เครื่องมือคำนวณอัจฉริยะ
 # ---------------------------------------------------------
 elif main_menu == "⚡ เครื่องมือคำนวณอัจฉริยะ":
     st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #F59E0B, #D97706);">⚡ เครื่องมือตรวจสอบสัจนิรันดร์อัตโนมัติ</div>', unsafe_allow_html=True)
     
     user_expr = st.text_input("ป้อนประพจน์ที่ต้องการตรวจสอบ (เช่น (p >> q) | (q >> p)):", value="(p >> q) | (q >> p)")
-    if st.button("🚀 ตรวจสอบความ เป็นสัจนิรันดร์"):
+    if st.button("🚀 ตรวจสอบความเป็นสัจนิรันดร์"):
         try:
             expr = sp.sympify(user_expr)
             syms = sorted([str(s) for s in expr.free_symbols])
@@ -362,7 +403,7 @@ elif main_menu == "⚡ เครื่องมือคำนวณอัจฉ
             st.error(f"รูปแบบประพจน์ไม่ถูกต้อง: {e}")
 
 # ---------------------------------------------------------
-# 12. เอกสารอ้างอิง
+# 11. เอกสารอ้างอิง
 # ---------------------------------------------------------
 elif main_menu == "📚 เอกสารอ้างอิง":
     st.markdown('<div class="main-header" style="background: linear-gradient(90deg, #475569, #334155);">📚 เอกสารอ้างอิง (References)</div>', unsafe_allow_html=True)
