@@ -1,14 +1,11 @@
 import streamlit as st
 import pandas as pd
 import itertools
-import random
 import re
 
-
-# =====================================================
+# ==================================================
 # ตั้งค่าหน้าเว็บไซต์
-# =====================================================
-
+# ==================================================
 st.set_page_config(
     page_title="Math Logic Learning & Solver",
     page_icon="🧠",
@@ -16,1147 +13,682 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-
-# =====================================================
+# ==================================================
 # ธีมสีฟ้าพาสเทล
-# =====================================================
-
+# ==================================================
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
 
-/* ฟอนต์และพื้นหลัง */
+html, body, [class*="css"] {
+    font-family: 'Prompt', sans-serif;
+}
+
 .stApp {
-    background: #F7FCFF;
-    color: #20384F;
+    background: linear-gradient(135deg, #f4f9ff, #e8f3ff);
+    color: #25415e;
 }
 
-.block-container {
-    max-width: 1250px;
-    padding-top: 1.5rem;
-}
-
-/* หัวข้อ */
-h1, h2, h3 {
-    color: #245A81 !important;
-}
-
-/* แถบเมนูด้านซ้าย */
 [data-testid="stSidebar"] {
-    background: #E3F2FD;
-    border-right: 3px solid #263B50;
+    background: linear-gradient(180deg, #d9ecff, #bddcff);
+    border-right: 2px solid #6597c8;
 }
 
-/* ข้อความในเมนู */
-[data-testid="stSidebar"] * {
-    font-family: sans-serif;
+h1, h2, h3 {
+    color: #245783;
 }
 
-/* หัวข้อในแถบเมนู */
-[data-testid="stSidebar"] h1 {
-    color: #245A81 !important;
-    font-weight: 800;
-}
-
-[data-testid="stSidebar"] h3 {
-    color: #245A81 !important;
-    font-weight: 700;
-}
-
-/* ปุ่มเมนูด้านซ้าย */
-[data-testid="stSidebar"] .stButton > button {
-    width: 100%;
-    min-height: 46px;
-    background: #BDE0FE;
-    color: #20384F;
-    border: 2px solid #263B50;
-    border-radius: 14px;
-    box-shadow: 4px 4px 0 #263B50;
-    font-size: 15px;
-    font-weight: 600;
-    text-align: left;
-    justify-content: flex-start;
-    margin-bottom: 9px;
-    transition: 0.2s;
-}
-
-/* เมื่อชี้เมาส์ */
-[data-testid="stSidebar"] .stButton > button:hover {
-    background: #89C2F9;
-    color: #20384F;
-    border-color: #263B50;
-    transform: translateY(-2px);
-}
-
-/* ปุ่มเมนูที่เลือก */
-[data-testid="stSidebar"] .stButton > button[kind="primary"] {
-    background: #89C2F9;
-    color: #142F47;
-    border: 2px solid #263B50;
-    box-shadow: 4px 4px 0 #263B50;
-}
-
-/* กล่องขยายหัวข้อย่อย */
-[data-testid="stSidebar"] [data-testid="stExpander"] {
-    background: #D8EEFF;
-    border: 1.5px solid #9CCCF2;
-    border-radius: 14px;
-    margin-bottom: 12px;
-}
-
-/* กล่องเนื้อหา */
-[data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius: 16px;
-}
-
-/* ปุ่มทั่วไป */
 div.stButton > button {
+    background-color: #f7fbff;
+    color: #245783;
+    border: 1.5px solid #6597c8;
     border-radius: 12px;
-    font-weight: 600;
+    box-shadow: 3px 3px 0px #a7c8e9;
+    font-weight: 500;
 }
 
-/* กล่องแจ้งเตือน */
-[data-testid="stAlert"] {
-    border-radius: 14px;
+div.stButton > button:hover {
+    background-color: #d9ecff;
+    border-color: #3479b8;
+    color: #17436b;
 }
 
-/* การ์ดคะแนน */
+.logic-card {
+    background-color: white;
+    border: 1px solid #c4def7;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(70, 120, 170, 0.10);
+}
+
 [data-testid="stMetric"] {
-    background: #E3F2FD;
-    padding: 16px;
-    border-radius: 16px;
-    border: 1px solid #B5D9F4;
-}
-
-/* เส้นคั่น */
-hr {
-    border-color: #B5D9F4;
-}
-
-/* รองรับโทรศัพท์ */
-@media (max-width: 768px) {
-    .block-container {
-        padding: 1rem;
-    }
-
-    h1 {
-        font-size: 1.8rem !important;
-    }
+    background: white;
+    border: 1px solid #c4def7;
+    border-radius: 14px;
+    padding: 12px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 
-# =====================================================
-# ระบบเก็บหน้าปัจจุบัน
-# =====================================================
-
-if "page" not in st.session_state:
-    st.session_state.page = "หน้าแรก"
-
-
-def change_page(page):
-    st.session_state.page = page
-
-
-def menu_button(label, page):
-    selected = st.session_state.page == page
-
-    st.sidebar.button(
-        label,
-        key=f"menu_{page}",
-        use_container_width=True,
-        type="primary" if selected else "secondary",
-        on_click=change_page,
-        args=(page,)
-    )
-
-
-# =====================================================
-# ข้อมูลบทเรียน
-# =====================================================
-
-LESSONS = {
-
-    "บทที่ 1 ความรู้เบื้องต้น": {
-
-        "ความหมายของตรรกศาสตร์": {
-            "content": """
-ตรรกศาสตร์ (Logic) เป็นศาสตร์ที่ศึกษาเกี่ยวกับ
-หลักการคิดอย่างมีเหตุผล การวิเคราะห์ข้ออ้าง
-และการตรวจสอบว่าข้อสรุปเป็นไปตามเหตุที่กำหนดหรือไม่
-
-ตรรกศาสตร์มีความสำคัญต่อการเรียนคณิตศาสตร์
-เนื่องจากใช้เป็นพื้นฐานของการพิสูจน์และการให้เหตุผล
-""",
-            "example": "ถ้า p เป็นจริง และ p → q เป็นจริง จะสรุปได้ว่า q เป็นจริง"
-        },
-
-        "ประพจน์": {
-            "content": """
-ประพจน์ (Proposition) คือประโยคบอกเล่าที่สามารถ
-ระบุค่าความจริงได้ว่าเป็นจริงหรือเป็นเท็จอย่างใดอย่างหนึ่ง
-
-ตัวอย่างประพจน์
-- 2 + 3 = 5
-- 7 เป็นจำนวนคู่
-- กรุงเทพมหานครเป็นเมืองหลวงของประเทศไทย
-
-ประโยคคำถามและประโยคคำสั่งไม่ถือเป็นประพจน์
-""",
-            "example": "2 + 3 = 5 เป็นประพจน์ที่มีค่าความจริงเป็น T"
-        },
-
-        "ค่าความจริง": {
-            "content": """
-ค่าความจริงของประพจน์มี 2 ค่า ได้แก่
-
-- T (True) หมายถึง จริง
-- F (False) หมายถึง เท็จ
-
-ในตรรกศาสตร์ประพจน์แบบดั้งเดิม
-แต่ละประพจน์จะมีค่าความจริงเพียงค่าเดียว
-""",
-            "example": "5 > 3 มีค่าความจริงเป็น T"
-        },
-
-        "ตัวแปรประพจน์": {
-            "content": """
-ตัวแปรประพจน์ใช้แทนข้อความหรือประพจน์ต่าง ๆ
-
-นิยมใช้อักษร p, q, r และ s
-
-การใช้ตัวแปรช่วยให้สามารถเขียนประพจน์ที่ซับซ้อน
-ให้อยู่ในรูปสัญลักษณ์ทางตรรกศาสตร์ได้
-""",
-            "example": "กำหนด p : วันนี้ฝนตก และ q : ถนนเปียก"
-        }
-    },
-
-    "บทที่ 2 ตัวเชื่อมตรรกศาสตร์": {
-
-        "นิเสธ (NOT)": {
-            "content": """
-นิเสธของประพจน์ p เขียนแทนด้วย ¬p
-
-นิเสธมีค่าความจริงตรงข้ามกับประพจน์เดิม
-
-| p | ¬p |
-|---|---|
-| T | F |
-| F | T |
-""",
-            "example": "ถ้า p = T แล้ว ¬p = F"
-        },
-
-        "การเชื่อมแบบและ (AND)": {
-            "content": """
-การเชื่อมแบบและ เขียนแทนด้วย p ∧ q
-
-จะเป็นจริงเมื่อประพจน์ทั้งสองเป็นจริงเท่านั้น
-
-| p | q | p ∧ q |
-|---|---|---|
-| T | T | T |
-| T | F | F |
-| F | T | F |
-| F | F | F |
-""",
-            "example": "T ∧ F = F"
-        },
-
-        "การเชื่อมแบบหรือ (OR)": {
-            "content": """
-การเชื่อมแบบหรือ เขียนแทนด้วย p ∨ q
-
-จะเป็นจริงเมื่อมีประพจน์อย่างน้อยหนึ่งประพจน์เป็นจริง
-
-| p | q | p ∨ q |
-|---|---|---|
-| T | T | T |
-| T | F | T |
-| F | T | T |
-| F | F | F |
-""",
-            "example": "T ∨ F = T"
-        },
-
-        "อิมพลิเคชัน (Implication)": {
-            "content": """
-อิมพลิเคชัน เขียนแทนด้วย p → q
-
-อ่านว่า ถ้า p แล้ว q
-
-เป็นเท็จเพียงกรณีเดียว คือ p เป็นจริง และ q เป็นเท็จ
-
-| p | q | p → q |
-|---|---|---|
-| T | T | T |
-| T | F | F |
-| F | T | T |
-| F | F | T |
-""",
-            "example": "T → F = F"
-        },
-
-        "สมมูลสองทาง (Biconditional)": {
-            "content": """
-สมมูลสองทาง เขียนแทนด้วย p ↔ q
-
-อ่านว่า p ก็ต่อเมื่อ q
-
-จะเป็นจริงเมื่อ p และ q มีค่าความจริงเหมือนกัน
-
-| p | q | p ↔ q |
-|---|---|---|
-| T | T | T |
-| T | F | F |
-| F | T | F |
-| F | F | T |
-""",
-            "example": "T ↔ T = T"
-        }
-    },
-
-    "บทที่ 3 สัจนิรันดร์และสมมูล": {
-
-        "สัจนิรันดร์": {
-            "content": """
-สัจนิรันดร์ (Tautology) คือสูตรตรรกศาสตร์
-ที่มีค่าความจริงเป็นจริงในทุกกรณี
-
-ไม่ว่าจะกำหนดค่าความจริงของตัวแปรอย่างไร
-สูตรนั้นก็ยังคงเป็นจริงเสมอ
-""",
-            "example": "p ∨ ¬p เป็นสัจนิรันดร์"
-        },
-
-        "ข้อขัดแย้ง": {
-            "content": """
-ข้อขัดแย้ง (Contradiction) คือสูตรตรรกศาสตร์
-ที่มีค่าความจริงเป็นเท็จในทุกกรณี
-""",
-            "example": "p ∧ ¬p เป็นข้อขัดแย้ง"
-        },
-
-        "กรณีอื่น (Contingency)": {
-            "content": """
-Contingency คือสูตรตรรกศาสตร์ที่มีทั้งกรณีจริง
-และกรณีเท็จ ขึ้นอยู่กับค่าความจริงของตัวแปร
-""",
-            "example": "p ∧ q เป็น Contingency"
-        },
-
-        "สมมูลทางตรรกศาสตร์": {
-            "content": """
-สูตรสองสูตรจะสมมูลทางตรรกศาสตร์กัน
-เมื่อมีค่าความจริงเหมือนกันในทุกกรณี
-
-ใช้สัญลักษณ์ ≡ แทนความสมมูล
-""",
-            "example": "p → q ≡ ¬p ∨ q"
-        },
-
-        "กฎของเดอมอร์แกน": {
-            "content": """
-กฎของเดอมอร์แกน (De Morgan's Laws)
-
-1. ¬(p ∧ q) ≡ ¬p ∨ ¬q
-
-2. ¬(p ∨ q) ≡ ¬p ∧ ¬q
-
-ใช้สำหรับเปลี่ยนรูปนิเสธของประพจน์เชิงประกอบ
-""",
-            "example": "¬(p ∧ q) ≡ ¬p ∨ ¬q"
-        }
-    },
-
-    "บทที่ 4 การอ้างเหตุผล": {
-
-        "ความหมายของการอ้างเหตุผล": {
-            "content": """
-การอ้างเหตุผลประกอบด้วย
-
-1. เหตุ (Premises)
-2. ข้อสรุป (Conclusion)
-
-การอ้างเหตุผลจะสมเหตุสมผลเมื่อไม่มีกรณีที่
-เหตุทุกข้อเป็นจริงแต่ข้อสรุปเป็นเท็จ
-""",
-            "example": "p → q, p ∴ q"
-        },
-
-        "Modus Ponens": {
-            "content": """
-Modus Ponens เป็นรูปแบบการอ้างเหตุผลที่สมเหตุสมผล
-
-รูปแบบ
-
-p → q
-
-p
-
-∴ q
-""",
-            "example": "ถ้าฝนตก ถนนเปียก / ฝนตก / ดังนั้น ถนนเปียก"
-        },
-
-        "Modus Tollens": {
-            "content": """
-Modus Tollens เป็นรูปแบบการอ้างเหตุผลที่สมเหตุสมผล
-
-รูปแบบ
-
-p → q
-
-¬q
-
-∴ ¬p
-""",
-            "example": "p → q, ¬q ∴ ¬p"
-        },
-
-        "การตรวจความสมเหตุสมผล": {
-            "content": """
-สามารถตรวจสอบความสมเหตุสมผลได้ด้วยตารางค่าความจริง
-
-พิจารณาว่ามีกรณีที่เหตุทุกข้อเป็นจริง
-แต่ข้อสรุปเป็นเท็จหรือไม่
-
-ถ้ามีกรณีดังกล่าว แสดงว่าการอ้างเหตุผลไม่สมเหตุสมผล
-""",
-            "example": "p → q, p ∴ q เป็นการอ้างเหตุผลที่สมเหตุสมผล"
-        }
-    },
-
-    "บทที่ 5 ประโยคเปิดและตัวบ่งปริมาณ": {
-
-        "ประโยคเปิด": {
-            "content": """
-ประโยคเปิดคือข้อความที่มีตัวแปร
-ซึ่งค่าความจริงขึ้นอยู่กับค่าที่แทนตัวแปร
-
-เมื่อกำหนดค่าตัวแปรแล้ว
-จึงสามารถตรวจสอบค่าความจริงได้
-""",
-            "example": "x + 2 = 5 เป็นจริงเมื่อ x = 3"
-        },
-
-        "ตัวบ่งปริมาณสากล": {
-            "content": """
-ตัวบ่งปริมาณสากลใช้สัญลักษณ์ ∀
-
-อ่านว่า สำหรับทุกตัว
-
-ใช้ระบุว่าข้อความเป็นจริงสำหรับสมาชิกทุกตัว
-ในขอบเขตที่กำหนด
-""",
-            "example": "∀x P(x)"
-        },
-
-        "ตัวบ่งปริมาณมีอยู่": {
-            "content": """
-ตัวบ่งปริมาณมีอยู่ใช้สัญลักษณ์ ∃
-
-อ่านว่า มีอย่างน้อยหนึ่งตัว
-
-ใช้ระบุว่ามีสมาชิกอย่างน้อยหนึ่งตัว
-ที่ทำให้ข้อความเป็นจริง
-""",
-            "example": "∃x P(x)"
-        },
-
-        "นิเสธของตัวบ่งปริมาณ": {
-            "content": """
-สูตรสำคัญ
-
-¬(∀x P(x)) ≡ ∃x ¬P(x)
-
-¬(∃x P(x)) ≡ ∀x ¬P(x)
-""",
-            "example": "นิเสธของ 'ทุกคนผ่าน' คือ 'มีอย่างน้อยหนึ่งคนไม่ผ่าน'"
-        }
-    },
-
-    "บทที่ 6 การให้เหตุผลและการพิสูจน์": {
-
-        "การให้เหตุผลแบบนิรนัย": {
-            "content": """
-การให้เหตุผลแบบนิรนัย (Deductive Reasoning)
-เป็นการให้เหตุผลจากหลักทั่วไปไปสู่ข้อสรุปเฉพาะ
-
-หากเหตุเป็นจริงและรูปแบบการอ้างเหตุผลสมเหตุสมผล
-ข้อสรุปจะเป็นจริง
-""",
-            "example": "จำนวนคู่ทุกจำนวนหารด้วย 2 ลงตัว และ 8 เป็นจำนวนคู่ ดังนั้น 8 หารด้วย 2 ลงตัว"
-        },
-
-        "การให้เหตุผลแบบอุปนัย": {
-            "content": """
-การให้เหตุผลแบบอุปนัย (Inductive Reasoning)
-เป็นการใช้ข้อมูลหรือการสังเกตหลายกรณี
-เพื่อคาดการณ์รูปแบบหรือข้อสรุปทั่วไป
-
-ข้อสรุปจากอุปนัยอาจต้องตรวจสอบเพิ่มเติม
-""",
-            "example": "สังเกตรูปแบบของลำดับจำนวน แล้วคาดการณ์พจน์ถัดไป"
-        },
-
-        "การพิสูจน์ทางคณิตศาสตร์": {
-            "content": """
-การพิสูจน์ทางคณิตศาสตร์ใช้เหตุผล
-นิยาม ทฤษฎีบท และกฎที่ยอมรับแล้ว
-เพื่อแสดงว่าข้อความที่ต้องการพิสูจน์เป็นจริง
-""",
-            "example": "การพิสูจน์โดยตรง และการพิสูจน์โดยข้อขัดแย้ง"
-        }
-    }
+# ==================================================
+# ระบบประมวลผลตรรกศาสตร์
+# ==================================================
+
+OPERATORS = {
+    "¬": "NOT",
+    "~": "NOT",
+    "!": "NOT",
+    "∧": "AND",
+    "&": "AND",
+    "∨": "OR",
+    "|": "OR",
+    "→": "IMP",
+    "->": "IMP",
+    "=>": "IMP",
+    "↔": "IFF",
+    "<->": "IFF",
+    "<=>": "IFF",
 }
 
-
-# =====================================================
-# ระบบคำนวณตรรกศาสตร์
-# =====================================================
-
-TOKEN_RE = re.compile(
-    r"\s*(<->|<=>|->|=>|[()¬~!∧&∨|→↔]|[A-Za-z][A-Za-z0-9_]*)"
+TOKEN_PATTERN = re.compile(
+    r"<->|<=>|->|=>|[()¬~!∧&∨|→↔]|[A-Za-z][A-Za-z0-9_]*"
 )
 
 
-def tokenize(expr):
-    tokens = []
-    pos = 0
-
-    while pos < len(expr):
-        if expr[pos:].strip() == "":
-            break
-
-        match = TOKEN_RE.match(expr, pos)
-
-        if not match:
-            raise ValueError(
-                "ไม่รู้จักสัญลักษณ์: " + expr[pos:]
-            )
-
-        token = match.group(1)
-        pos = match.end()
-
-        aliases = {
-            "¬": "NOT",
-            "~": "NOT",
-            "!": "NOT",
-            "∧": "AND",
-            "&": "AND",
-            "∨": "OR",
-            "|": "OR",
-            "→": "IMP",
-            "->": "IMP",
-            "=>": "IMP",
-            "↔": "IFF",
-            "<->": "IFF",
-            "<=>": "IFF"
-        }
-
-        tokens.append(aliases.get(token, token))
-
-    if not tokens:
-        raise ValueError("กรุณากรอกสูตรตรรกศาสตร์")
-
-    return tokens
+class LogicError(Exception):
+    pass
 
 
-class LogicParser:
+def tokenize(formula):
+    tokens = TOKEN_PATTERN.findall(formula)
+    cleaned = re.sub(r"\s+", "", formula)
 
+    if "".join(tokens).lower() != cleaned.lower():
+        raise LogicError(
+            "สูตรมีสัญลักษณ์ที่ไม่รองรับ "
+            "กรุณาใช้ p, q, r และสัญลักษณ์ ¬ ∧ ∨ → ↔"
+        )
+
+    result = []
+
+    for token in tokens:
+        if token in OPERATORS:
+            result.append(OPERATORS[token])
+        elif token == "(" or token == ")":
+            result.append(token)
+        else:
+            result.append(token)
+
+    if not result:
+        raise LogicError("กรุณาป้อนสูตรตรรกศาสตร์")
+
+    return result
+
+
+class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
-        self.pos = 0
+        self.position = 0
 
     def peek(self):
-        if self.pos < len(self.tokens):
-            return self.tokens[self.pos]
+        if self.position < len(self.tokens):
+            return self.tokens[self.position]
         return None
 
-    def eat(self):
+    def take(self):
         token = self.peek()
-        self.pos += 1
+        if token is not None:
+            self.position += 1
         return token
 
     def parse(self):
-        result = self.iff()
+        node = self.parse_iff()
 
         if self.peek() is not None:
-            raise ValueError("รูปแบบสูตรไม่ถูกต้อง")
+            raise LogicError(
+                f"ไม่สามารถอ่านสัญลักษณ์ {self.peek()} ได้"
+            )
 
-        return result
+        return node
 
-    def iff(self):
-        node = self.imp()
+    def parse_iff(self):
+        node = self.parse_imp()
 
         while self.peek() == "IFF":
-            self.eat()
-            node = ("IFF", node, self.imp())
+            self.take()
+            node = ("IFF", node, self.parse_imp())
 
         return node
 
-    def imp(self):
-        node = self.or_expr()
+    def parse_imp(self):
+        node = self.parse_or()
 
         if self.peek() == "IMP":
-            self.eat()
-            node = ("IMP", node, self.imp())
+            self.take()
+            node = ("IMP", node, self.parse_imp())
 
         return node
 
-    def or_expr(self):
-        node = self.and_expr()
+    def parse_or(self):
+        node = self.parse_and()
 
         while self.peek() == "OR":
-            self.eat()
-            node = ("OR", node, self.and_expr())
+            self.take()
+            node = ("OR", node, self.parse_and())
 
         return node
 
-    def and_expr(self):
-        node = self.unary()
+    def parse_and(self):
+        node = self.parse_not()
 
         while self.peek() == "AND":
-            self.eat()
-            node = ("AND", node, self.unary())
+            self.take()
+            node = ("AND", node, self.parse_not())
 
         return node
 
-    def unary(self):
-        token = self.peek()
+    def parse_not(self):
+        if self.peek() == "NOT":
+            self.take()
+            return ("NOT", self.parse_not())
 
-        if token == "NOT":
-            self.eat()
-            return ("NOT", self.unary())
+        return self.parse_atom()
 
-        if token == "(":
-            self.eat()
-            node = self.iff()
-
-            if self.peek() != ")":
-                raise ValueError("วงเล็บไม่ครบ")
-
-            self.eat()
-            return node
+    def parse_atom(self):
+        token = self.take()
 
         if token is None:
-            raise ValueError("สูตรไม่สมบูรณ์")
+            raise LogicError("สูตรไม่สมบูรณ์")
 
-        if token in ("AND", "OR", "IMP", "IFF", ")"):
-            raise ValueError("ตำแหน่งตัวเชื่อมไม่ถูกต้อง")
+        if token == "(":
+            node = self.parse_iff()
 
-        self.eat()
+            if self.take() != ")":
+                raise LogicError("วงเล็บเปิดและปิดไม่ครบ")
 
-        if token.upper() in ("T", "TRUE"):
-            return ("CONST", True)
+            return node
 
-        if token.upper() in ("F", "FALSE"):
-            return ("CONST", False)
+        if token in (")", "AND", "OR", "IMP", "IFF", "NOT"):
+            raise LogicError("ตำแหน่งตัวดำเนินการไม่ถูกต้อง")
 
         return ("VAR", token)
 
 
-def parse_logic(expr):
-    return LogicParser(tokenize(expr)).parse()
+def parse_formula(formula):
+    return Parser(tokenize(formula)).parse()
 
 
-def get_vars(node):
+def get_variables(node):
     if node[0] == "VAR":
         return {node[1]}
 
-    if node[0] == "CONST":
-        return set()
-
     if node[0] == "NOT":
-        return get_vars(node[1])
+        return get_variables(node[1])
 
-    return get_vars(node[1]) | get_vars(node[2])
-
-
-def evaluate(node, env):
-    op = node[0]
-
-    if op == "CONST":
-        return node[1]
-
-    if op == "VAR":
-        return env[node[1]]
-
-    if op == "NOT":
-        return not evaluate(node[1], env)
-
-    a = evaluate(node[1], env)
-    b = evaluate(node[2], env)
-
-    if op == "AND":
-        return a and b
-
-    if op == "OR":
-        return a or b
-
-    if op == "IMP":
-        return (not a) or b
-
-    if op == "IFF":
-        return a == b
-
-    raise ValueError("ตัวเชื่อมไม่ถูกต้อง")
+    return get_variables(node[1]) | get_variables(node[2])
 
 
-def truth_table(expr):
-    node = parse_logic(expr)
-    variables = sorted(get_vars(node))
+def evaluate(node, values):
+    kind = node[0]
 
-    if len(variables) > 10:
-        raise ValueError("กรุณาใช้ตัวแปรไม่เกิน 10 ตัว")
+    if kind == "VAR":
+        return values[node[1]]
+
+    if kind == "NOT":
+        return not evaluate(node[1], values)
+
+    left = evaluate(node[1], values)
+    right = evaluate(node[2], values)
+
+    if kind == "AND":
+        return left and right
+
+    if kind == "OR":
+        return left or right
+
+    if kind == "IMP":
+        return (not left) or right
+
+    if kind == "IFF":
+        return left == right
+
+    raise LogicError("ไม่รู้จักตัวดำเนินการ")
+
+
+def truth_table(nodes):
+    variables = sorted(
+        set().union(*(get_variables(node) for node in nodes))
+    )
+
+    if len(variables) > 8:
+        raise LogicError("รองรับตัวแปรไม่เกิน 8 ตัว")
 
     rows = []
 
-    for values in itertools.product(
-        [True, False],
-        repeat=len(variables)
+    for combination in itertools.product(
+        [True, False], repeat=len(variables)
     ):
-        env = dict(zip(variables, values))
+        values = dict(zip(variables, combination))
 
         row = {
-            var: "T" if env[var] else "F"
-            for var in variables
+            variable: "T" if values[variable] else "F"
+            for variable in variables
         }
 
-        row[expr] = (
-            "T" if evaluate(node, env) else "F"
-        )
+        for index, node in enumerate(nodes):
+            result = evaluate(node, values)
+            row[f"ผลลัพธ์ {index + 1}"] = (
+                "T" if result else "F"
+            )
 
         rows.append(row)
 
-    return pd.DataFrame(rows), node
+    return variables, rows
 
 
-def classify_formula(expr):
-    df, node = truth_table(expr)
+def classify_formula(node):
+    _, rows = truth_table([node])
 
-    vars_list = sorted(get_vars(node))
-    results = []
+    results = [row["ผลลัพธ์ 1"] for row in rows]
 
-    for values in itertools.product(
-        [True, False],
-        repeat=len(vars_list)
-    ):
-        env = dict(zip(vars_list, values))
-        results.append(evaluate(node, env))
-
-    if all(results):
+    if all(value == "T" for value in results):
         return "สัจนิรันดร์ (Tautology)"
 
-    if not any(results):
+    if all(value == "F" for value in results):
         return "ข้อขัดแย้ง (Contradiction)"
 
-    return "กรณีอื่น (Contingency)"
+    return "ประพจน์ไม่แน่นอน (Contingency)"
 
 
-def check_equivalence(expr1, expr2):
-    node1 = parse_logic(expr1)
-    node2 = parse_logic(expr2)
+# ==================================================
+# เนื้อหาบทเรียน
+# ==================================================
 
-    vars_list = sorted(
-        get_vars(node1) | get_vars(node2)
-    )
+LESSONS = {
+    "บทที่ 1 ประพจน์": {
+        "ความหมายของประพจน์":
+            "ประพจน์คือประโยคบอกเล่าที่ระบุได้ว่าเป็นจริงหรือเป็นเท็จ",
+        "ค่าความจริง":
+            "ค่าความจริงมี 2 ค่า คือ จริง (T) และเท็จ (F)",
+        "ตัวแปรประพจน์":
+            "นิยมใช้ p, q, r แทนประพจน์ต่าง ๆ"
+    },
 
-    if len(vars_list) > 10:
-        raise ValueError("กรุณาใช้ตัวแปรรวมไม่เกิน 10 ตัว")
+    "บทที่ 2 ตัวดำเนินการทางตรรกศาสตร์": {
+        "นิเสธ":
+            "¬p มีค่าความจริงตรงข้ามกับ p",
+        "ตัวเชื่อมและ":
+            "p ∧ q เป็นจริงเมื่อ p และ q เป็นจริงทั้งคู่",
+        "ตัวเชื่อมหรือ":
+            "p ∨ q เป็นเท็จเมื่อ p และ q เป็นเท็จทั้งคู่",
+        "อิมพลิเคชัน":
+            "p → q เป็นเท็จเฉพาะกรณี p เป็นจริงและ q เป็นเท็จ",
+        "สมมูล":
+            "p ↔ q เป็นจริงเมื่อ p และ q มีค่าความจริงเหมือนกัน"
+    },
 
-    for values in itertools.product(
-        [True, False],
-        repeat=len(vars_list)
-    ):
-        env = dict(zip(vars_list, values))
+    "บทที่ 3 ตารางค่าความจริง": {
+        "การสร้างตาราง":
+            "ถ้ามีตัวแปร n ตัว จะมีชุดค่าความจริงทั้งหมด 2ⁿ แถว",
+        "การคำนวณ":
+            "คำนวณตามวงเล็บและตัวดำเนินการทางตรรกศาสตร์"
+    },
 
-        if evaluate(node1, env) != evaluate(node2, env):
-            return False, env
+    "บทที่ 4 สัจนิรันดร์และความสมมูล": {
+        "สัจนิรันดร์":
+            "สูตรที่เป็นจริงทุกแถวเรียกว่าสัจนิรันดร์",
+        "ข้อขัดแย้ง":
+            "สูตรที่เป็นเท็จทุกแถวเรียกว่าข้อขัดแย้ง",
+        "ความสมมูล":
+            "สูตรสองสูตรสมมูลกันเมื่อผลลัพธ์ตรงกันทุกแถว"
+    },
 
-    return True, None
+    "บทที่ 5 การอ้างเหตุผล": {
+        "ความสมเหตุสมผล":
+            "การอ้างเหตุผลสมเหตุสมผลเมื่อไม่มีกรณีที่เหตุทุกข้อจริงแต่ข้อสรุปเท็จ",
+        "Modus Ponens":
+            "รูปแบบ p → q, p ดังนั้น q",
+        "Modus Tollens":
+            "รูปแบบ p → q, ¬q ดังนั้น ¬p"
+    },
 
-
-def check_argument(premises, conclusion):
-    premise_nodes = [parse_logic(p) for p in premises]
-    conclusion_node = parse_logic(conclusion)
-
-    vars_set = get_vars(conclusion_node)
-
-    for node in premise_nodes:
-        vars_set |= get_vars(node)
-
-    vars_list = sorted(vars_set)
-
-    if len(vars_list) > 10:
-        raise ValueError("กรุณาใช้ตัวแปรรวมไม่เกิน 10 ตัว")
-
-    for values in itertools.product(
-        [True, False],
-        repeat=len(vars_list)
-    ):
-        env = dict(zip(vars_list, values))
-
-        premises_true = all(
-            evaluate(node, env)
-            for node in premise_nodes
-        )
-
-        conclusion_false = not evaluate(
-            conclusion_node,
-            env
-        )
-
-        if premises_true and conclusion_false:
-            return False, env
-
-    return True, None
+    "บทที่ 6 ต้นไม้ความจริง": {
+        "แนวคิด":
+            "ต้นไม้ความจริงใช้แยกสูตรออกเป็นเงื่อนไขย่อยเพื่อตรวจสอบความเป็นไปได้",
+        "การปิดกิ่ง":
+            "กิ่งที่มีทั้ง p และ ¬p ถือว่าขัดแย้งและปิดกิ่ง"
+    }
+}
 
 
-# =====================================================
-# แถบเมนูด้านซ้าย
-# =====================================================
+# ==================================================
+# คลังคำถาม
+# ประกาศไว้นอก if/elif เพื่อป้องกัน SyntaxError
+# ==================================================
 
-st.sidebar.title("🧠 MATH LOGIC")
-st.sidebar.caption("Learning & Solver")
-st.sidebar.markdown("---")
-
-st.sidebar.subheader("ภาพรวมระบบ")
-
-menu_button("🏠 หน้าหลัก", "หน้าแรก")
-menu_button("📖 ภาพรวมบทเรียนและทฤษฎี", "ภาพรวมบทเรียน")
-
-st.sidebar.markdown("---")
-st.sidebar.subheader("โมดูลการเรียนรู้")
-
-chapter_icons = [
-    "📚", "🔗", "🧩", "🧠", "📐", "📘"
+QUESTIONS = [
+    {
+        "question": "ถ้า p เป็นจริง แล้ว ¬p มีค่าใด",
+        "choices": ["T", "F"],
+        "answer": "F",
+        "explanation": "นิเสธมีค่าความจริงตรงข้ามกับประพจน์เดิม"
+    },
+    {
+        "question": "p ∧ q เป็นจริงเมื่อใด",
+        "choices": [
+            "เมื่อ p จริงเท่านั้น",
+            "เมื่อทั้ง p และ q จริง",
+            "เมื่อทั้งคู่เท็จ"
+        ],
+        "answer": "เมื่อทั้ง p และ q จริง",
+        "explanation": "ตัวเชื่อม AND ต้องจริงทั้งสองด้าน"
+    },
+    {
+        "question": "p → q เป็นเท็จในกรณีใด",
+        "choices": ["T → T", "T → F", "F → T", "F → F"],
+        "answer": "T → F",
+        "explanation": "อิมพลิเคชันเป็นเท็จเฉพาะกรณี T → F"
+    },
+    {
+        "question": "ถ้ามีตัวแปร 3 ตัว จะมีตารางกี่แถว",
+        "choices": ["3", "6", "8", "9"],
+        "answer": "8",
+        "explanation": "จำนวนแถวคือ 2³ = 8"
+    },
+    {
+        "question": "p ∨ ¬p เป็นสูตรประเภทใด",
+        "choices": [
+            "สัจนิรันดร์",
+            "ข้อขัดแย้ง",
+            "ประพจน์ไม่แน่นอน"
+        ],
+        "answer": "สัจนิรันดร์",
+        "explanation": "ไม่ว่า p จะเป็นจริงหรือเท็จ สูตรนี้เป็นจริงเสมอ"
+    }
 ]
 
-for index, (chapter, topics) in enumerate(LESSONS.items()):
 
-    icon = chapter_icons[index]
+# ==================================================
+# เมนูด้านซ้าย
+# ==================================================
 
-    with st.sidebar.expander(
-        f"{icon} {chapter}",
-        expanded=st.session_state.page in topics
-    ):
-        for topic in topics:
-            menu_button(
-                f"↳ {topic}",
-                topic
-            )
+if "page" not in st.session_state:
+    st.session_state.page = "หน้าแรก"
 
-st.sidebar.markdown("---")
-st.sidebar.subheader("เครื่องมือและการประเมิน")
+with st.sidebar:
+    st.title("🧠 Math Logic")
+    st.caption("Learning & Solver")
+    st.markdown("---")
 
-menu_button("🧮 เครื่องคำนวณตรรกศาสตร์", "เครื่องคำนวณ")
-menu_button("📊 ตารางค่าความจริง", "ตารางค่าความจริง")
-menu_button("🧠 ตรวจสอบสูตรตรรกศาสตร์", "ตรวจสอบสูตร")
-menu_button("🔄 ตรวจสอบสมมูล", "ตรวจสอบสมมูล")
-menu_button("⚖️ ตรวจสอบการอ้างเหตุผล", "ตรวจสอบเหตุผล")
-menu_button("🌳 แผนภาพต้นไม้", "แผนภาพต้นไม้")
-menu_button("📖 รวมสูตรตรรกศาสตร์", "รวมสูตร")
-menu_button("📝 แบบฝึกหัด", "แบบฝึกหัด")
-menu_button("🎮 เกมตรรกศาสตร์", "เกม")
-menu_button("📋 แบบทดสอบ", "แบบทดสอบ")
+    if st.button("🏠 หน้าแรก", use_container_width=True):
+        st.session_state.page = "หน้าแรก"
 
-st.sidebar.markdown("---")
-st.sidebar.subheader("ข้อมูลโครงงาน")
+    with st.expander("📘 บทเรียน", expanded=True):
+        for chapter, topics in LESSONS.items():
+            with st.expander(chapter):
+                for topic in topics:
+                    if st.button(
+                        topic,
+                        key=f"{chapter}_{topic}",
+                        use_container_width=True
+                    ):
+                        st.session_state.page = (
+                            f"lesson::{chapter}::{topic}"
+                        )
 
-menu_button("ℹ️ เกี่ยวกับเว็บไซต์", "เกี่ยวกับเว็บไซต์")
+    with st.expander("🧮 เครื่องมือคำนวณ"):
+        for name in [
+            "คำนวณค่าความจริง",
+            "ตารางค่าความจริง",
+            "ตรวจประเภทสูตร",
+            "ตรวจความสมมูล",
+            "ตรวจการอ้างเหตุผล"
+        ]:
+            if st.button(name, key=f"tool_{name}", use_container_width=True):
+                st.session_state.page = name
 
+    with st.expander("🎮 แบบฝึกฝน"):
+        for name in [
+            "แบบฝึกหัด",
+            "เกมจับคู่",
+            "แบบทดสอบ",
+            "ตัวอย่างต้นไม้ความจริง"
+        ]:
+            if st.button(name, key=f"practice_{name}", use_container_width=True):
+                st.session_state.page = name
 
-# =====================================================
-# แสดงเนื้อหาตามหน้าที่เลือก
-# =====================================================
+    with st.expander("📚 คลังความรู้"):
+        if st.button("รวมสูตรตรรกศาสตร์", use_container_width=True):
+            st.session_state.page = "รวมสูตรตรรกศาสตร์"
+
+        if st.button("เกี่ยวกับเว็บไซต์", use_container_width=True):
+            st.session_state.page = "เกี่ยวกับเว็บไซต์"
 
 page = st.session_state.page
 
 
-# -----------------------------------------------------
+# ==================================================
 # หน้าแรก
-# -----------------------------------------------------
+# ==================================================
 
 if page == "หน้าแรก":
-
-    st.title("🧠 Math Logic Learning & Solver")
-
-    st.subheader(
-        "เว็บไซต์สื่อการเรียนรู้ตรรกศาสตร์ทางคณิตศาสตร์"
-    )
-
-    st.info(
-        "เรียนรู้ • ฝึกคิด • ทดลองคำนวณ • ตรวจสอบคำตอบ"
-    )
+    st.markdown("""
+    <div class="logic-card">
+        <h1>🧠 Math Logic Learning & Solver</h1>
+        <h3>เรียนรู้ตรรกศาสตร์ให้เข้าใจง่ายขึ้น</h3>
+        <p>เว็บไซต์บทเรียน เครื่องมือคำนวณ และแบบฝึกหัด
+        สำหรับการเรียนตรรกศาสตร์คณิตศาสตร์</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("บทเรียน", len(LESSONS))
+    with col1:
+        st.markdown("""
+        <div class="logic-card">
+        <h3>📘 บทเรียน</h3>
+        <p>เรียนรู้แนวคิดพื้นฐานและตัวดำเนินการ</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    col2.metric(
-        "หัวข้อย่อย",
-        sum(len(x) for x in LESSONS.values())
+    with col2:
+        st.markdown("""
+        <div class="logic-card">
+        <h3>📊 ตารางค่าความจริง</h3>
+        <p>สร้างและตรวจสอบผลลัพธ์ของสูตร</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col3:
+        st.markdown("""
+        <div class="logic-card">
+        <h3>🎮 ฝึกฝน</h3>
+        <p>ทำแบบฝึกหัดและแบบทดสอบ</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.subheader("สัญลักษณ์ตรรกศาสตร์ที่ควรรู้")
+
+    st.dataframe(
+        pd.DataFrame([
+            ["¬p", "นิเสธ", "ไม่ p"],
+            ["p ∧ q", "และ", "จริงเมื่อทั้งคู่จริง"],
+            ["p ∨ q", "หรือ", "เท็จเมื่อทั้งคู่เท็จ"],
+            ["p → q", "ถ้า...แล้ว", "เท็จเฉพาะ T → F"],
+            ["p ↔ q", "ก็ต่อเมื่อ", "จริงเมื่อค่าตรงกัน"]
+        ], columns=["สัญลักษณ์", "ชื่อ", "ความหมาย"]),
+        use_container_width=True,
+        hide_index=True
     )
 
-    col3.metric("เครื่องมือและกิจกรรม", 10)
 
-    st.markdown("## 🩵 ยินดีต้อนรับ")
+# ==================================================
+# หน้าเรียนบทเรียน
+# ==================================================
 
-    st.write("""
-    เว็บไซต์นี้จัดทำขึ้นเพื่อส่งเสริมการเรียนรู้
-    เรื่องตรรกศาสตร์ทางคณิตศาสตร์
+elif page.startswith("lesson::"):
+    _, chapter, topic = page.split("::", 2)
 
-    ผู้เรียนสามารถศึกษาเนื้อหา ทบทวนสูตร
-    ทดลองสร้างตารางค่าความจริง
-    และฝึกทำแบบฝึกหัดได้ด้วยตนเอง
-    """)
+    st.title(chapter)
+    st.subheader(topic)
 
-    st.markdown("### วิธีใช้งาน")
+    st.markdown(
+        f'<div class="logic-card">{LESSONS[chapter][topic]}</div>',
+        unsafe_allow_html=True
+    )
 
-    st.write("""
-    1. เลือกบทเรียนจากแถบเมนูด้านซ้าย
-    2. กดหัวข้อย่อยที่ต้องการศึกษา
-    3. ทดลองใช้เครื่องคำนวณตรรกศาสตร์
-    4. ทำแบบฝึกหัดและแบบทดสอบ
-    """)
+    if st.button("กลับหน้าแรก"):
+        st.session_state.page = "หน้าแรก"
+        st.rerun()
 
 
-# -----------------------------------------------------
-# ภาพรวมบทเรียน
-# -----------------------------------------------------
+# ==================================================
+# คำนวณค่าความจริง
+# ==================================================
 
-elif page == "ภาพรวมบทเรียน":
+elif page == "คำนวณค่าความจริง":
+    st.title("🧮 คำนวณค่าความจริง")
 
-    st.title("📖 ภาพรวมบทเรียนและทฤษฎี")
-
-    for chapter, topics in LESSONS.items():
-
-        with st.container(border=True):
-
-            st.subheader(chapter)
-
-            for topic in topics:
-                st.write("📌", topic)
-
-
-# -----------------------------------------------------
-# เนื้อหาหัวข้อย่อย
-# -----------------------------------------------------
-
-elif any(
-    page in topics
-    for topics in LESSONS.values()
-):
-
-    for chapter, topics in LESSONS.items():
-
-        if page in topics:
-
-            lesson = topics[page]
-
-            st.caption(chapter)
-            st.title("📚 " + page)
-
-            st.markdown("### ความรู้เบื้องต้น")
-
-            with st.container(border=True):
-                st.markdown(lesson["content"])
-
-            st.markdown("### ตัวอย่าง")
-
-            st.success(lesson["example"])
-
-            st.markdown("### สรุปบทเรียน")
-
-            st.info(
-                "ศึกษาความหมายและตัวอย่างให้เข้าใจ "
-                "จากนั้นสามารถทดลองทำโจทย์ในเมนูเครื่องมือได้"
-            )
-
-            break
-
-
-# -----------------------------------------------------
-# เครื่องคำนวณค่าความจริง
-# -----------------------------------------------------
-
-elif page == "เครื่องคำนวณ":
-
-    st.title("🧮 เครื่องคำนวณตรรกศาสตร์")
-
-    expr = st.text_input(
-        "ป้อนสูตรตรรกศาสตร์",
-        "p & q"
+    formula = st.text_input(
+        "ใส่สูตรตรรกศาสตร์",
+        value="(p ∧ q) → ¬r"
     )
 
     try:
-        node = parse_logic(expr)
-        vars_list = sorted(get_vars(node))
+        node = parse_formula(formula)
+        vars_ = sorted(get_variables(node))
+        values = {}
 
-        if len(vars_list) > 10:
-            st.warning("กรุณาใช้ตัวแปรไม่เกิน 10 ตัว")
+        st.write("กำหนดค่าความจริง")
 
-        else:
-            env = {}
+        columns = st.columns(max(1, len(vars_)))
 
-            st.markdown("### กำหนดค่าความจริง")
-
-            for var in vars_list:
-
-                value = st.selectbox(
-                    f"ค่าของ {var}",
-                    ["T", "F"],
-                    key=f"calc_{var}"
+        for i, variable in enumerate(vars_):
+            with columns[i]:
+                choice = st.selectbox(
+                    f"ค่า {variable}",
+                    ["T (จริง)", "F (เท็จ)"],
+                    key=f"value_{variable}"
                 )
+                values[variable] = choice == "T (จริง)"
 
-                env[var] = value == "T"
+        if st.button("คำนวณ", type="primary"):
+            result = evaluate(node, values)
+            st.success(
+                "ผลลัพธ์: " + ("T (จริง)" if result else "F (เท็จ)")
+            )
 
-            if st.button("คำนวณค่าความจริง"):
-
-                result = evaluate(node, env)
-
-                st.success(
-                    "ผลลัพธ์ = "
-                    + ("T (จริง)" if result else "F (เท็จ)")
-                )
-
-    except ValueError as e:
-        st.error(str(e))
+    except LogicError as error:
+        st.error(str(error))
 
 
-# -----------------------------------------------------
+# ==================================================
 # ตารางค่าความจริง
-# -----------------------------------------------------
+# ==================================================
 
 elif page == "ตารางค่าความจริง":
-
     st.title("📊 ตารางค่าความจริง")
 
-    expr = st.text_input(
-        "ป้อนสูตร",
-        "(p & q) -> r"
-    )
+    formula = st.text_input("ใส่สูตร", value="p → q")
 
-    if st.button("สร้างตารางค่าความจริง"):
-
+    if st.button("สร้างตาราง", type="primary"):
         try:
-            df, node = truth_table(expr)
+            node = parse_formula(formula)
+            variables, rows = truth_table([node])
 
+            st.write(f"ตัวแปร: {', '.join(variables)}")
             st.dataframe(
-                df,
+                pd.DataFrame(rows),
                 use_container_width=True,
                 hide_index=True
             )
 
-            st.success(
-                f"จำนวนกรณีทั้งหมด {len(df)} กรณี"
-            )
-
-        except ValueError as e:
-            st.error(str(e))
+        except LogicError as error:
+            st.error(str(error))
 
 
-# -----------------------------------------------------
-# ตรวจสอบประเภทสูตร
-# -----------------------------------------------------
+# ==================================================
+# ตรวจประเภทสูตร
+# ==================================================
 
-elif page == "ตรวจสอบสูตร":
+elif page == "ตรวจประเภทสูตร":
+    st.title("🔎 ตรวจประเภทสูตร")
 
-    st.title("🧠 ตรวจสอบสูตรตรรกศาสตร์")
+    formula = st.text_input("สูตรที่ต้องการตรวจ", value="p ∨ ¬p")
 
-    expr = st.text_input(
-        "ป้อนสูตรที่ต้องการตรวจสอบ",
-        "p | ~p"
-    )
-
-    if st.button("ตรวจสอบสูตร"):
-
+    if st.button("ตรวจสอบ", type="primary"):
         try:
-            result = classify_formula(expr)
+            node = parse_formula(formula)
+            result = classify_formula(node)
 
             st.success(result)
 
-            df, node = truth_table(expr)
-
+            _, rows = truth_table([node])
             st.dataframe(
-                df,
+                pd.DataFrame(rows),
                 use_container_width=True,
                 hide_index=True
             )
 
-        except ValueError as e:
-            st.error(str(e))
+        except LogicError as error:
+            st.error(str(error))
 
 
-# -----------------------------------------------------
-# ตรวจสอบสมมูล
-# -----------------------------------------------------
+# ==================================================
+# ตรวจความสมมูล
+# ==================================================
 
-elif page == "ตรวจสอบสมมูล":
+elif page == "ตรวจความสมมูล":
+    st.title("⚖️ ตรวจสอบความสมมูล")
 
-    st.title("🔄 ตรวจสอบสมมูลทางตรรกศาสตร์")
+    formula1 = st.text_input("สูตรที่ 1", value="p → q")
+    formula2 = st.text_input("สูตรที่ 2", value="¬p ∨ q")
 
-    expr1 = st.text_input(
-        "สูตรที่ 1",
-        "p -> q"
-    )
-
-    expr2 = st.text_input(
-        "สูตรที่ 2",
-        "~p | q"
-    )
-
-    if st.button("ตรวจสอบสมมูล"):
-
+    if st.button("เปรียบเทียบ", type="primary"):
         try:
-            same, counterexample = check_equivalence(
-                expr1,
-                expr2
+            node1 = parse_formula(formula1)
+            node2 = parse_formula(formula2)
+
+            _, rows = truth_table([node1, node2])
+
+            equivalent = all(
+                row["ผลลัพธ์ 1"] == row["ผลลัพธ์ 2"]
+                for row in rows
             )
 
-            if same:
-                st.success(
-                    "สูตรทั้งสองสมมูลกัน"
-                )
-
+            if equivalent:
+                st.success("สูตรทั้งสองสมมูลกัน")
             else:
-                st.error(
-                    "สูตรทั้งสองไม่สมมูลกัน"
-                )
+                st.error("สูตรทั้งสองไม่สมมูลกัน")
 
-                st.write(
-                    "ตัวอย่างค่าความจริงที่ทำให้ต่างกัน:",
-                    counterexample
-                )
+            st.dataframe(
+                pd.DataFrame(rows),
+                use_container_width=True,
+                hide_index=True
+            )
 
-        except ValueError as e:
-            st.error(str(e))
+        except LogicError as error:
+            st.error(str(error))
 
 
-# -----------------------------------------------------
-# ตรวจสอบการอ้างเหตุผล
-# -----------------------------------------------------
+# ==================================================
+# ตรวจการอ้างเหตุผล
+# ==================================================
 
-elif page == "ตรวจสอบเหตุผล":
-
-    st.title("⚖️ ตรวจสอบการอ้างเหตุผล")
+elif page == "ตรวจการอ้างเหตุผล":
+    st.title("🧩 ตรวจสอบการอ้างเหตุผล")
 
     premises_text = st.text_area(
         "เหตุ (หนึ่งสูตรต่อหนึ่งบรรทัด)",
-        "p -> q\np"
+        value="p → q\np"
     )
 
-    conclusion = st.text_input(
-        "ข้อสรุป",
-        "q"
-    )
+    conclusion = st.text_input("ข้อสรุป", value="q")
 
-    if st.button("ตรวจสอบความสมเหตุสมผล"):
-
+    if st.button("ตรวจสอบ", type="primary"):
         try:
             premises = [
                 line.strip()
@@ -1164,417 +696,279 @@ elif page == "ตรวจสอบเหตุผล":
                 if line.strip()
             ]
 
-            if not premises:
-                st.warning("กรุณากรอกเหตุ")
-            else:
-                valid, counterexample = check_argument(
-                    premises,
-                    conclusion
+            premise_nodes = [
+                parse_formula(item) for item in premises
+            ]
+            conclusion_node = parse_formula(conclusion)
+
+            nodes = premise_nodes + [conclusion_node]
+            _, rows = truth_table(nodes)
+
+            counterexamples = []
+
+            for row in rows:
+                all_premises_true = all(
+                    row[f"ผลลัพธ์ {i+1}"] == "T"
+                    for i in range(len(premise_nodes))
                 )
 
-                if valid:
-                    st.success(
-                        "การอ้างเหตุผลสมเหตุสมผล"
-                    )
+                conclusion_false = (
+                    row[f"ผลลัพธ์ {len(nodes)}"] == "F"
+                )
 
-                else:
-                    st.error(
-                        "การอ้างเหตุผลไม่สมเหตุสมผล"
-                    )
+                if all_premises_true and conclusion_false:
+                    counterexamples.append(row)
 
-                    st.write(
-                        "ตัวอย่างค้าน:",
-                        counterexample
-                    )
+            if counterexamples:
+                st.error("การอ้างเหตุผลไม่สมเหตุสมผล")
+                st.write("พบกรณีโต้แย้งดังนี้")
+                st.dataframe(
+                    pd.DataFrame(counterexamples),
+                    use_container_width=True,
+                    hide_index=True
+                )
+            else:
+                st.success("การอ้างเหตุผลสมเหตุสมผล")
 
-        except ValueError as e:
-            st.error(str(e))
+            with st.expander("ดูตารางค่าความจริงทั้งหมด"):
+                st.dataframe(
+                    pd.DataFrame(rows),
+                    use_container_width=True,
+                    hide_index=True
+                )
 
-
-# -----------------------------------------------------
-# แผนภาพต้นไม้
-# -----------------------------------------------------
-
-elif page == "แผนภาพต้นไม้":
-
-    st.title("🌳 แผนภาพต้นไม้")
-
-    st.write(
-        "แผนภาพต้นไม้ (Truth Tree) "
-        "เป็นวิธีหนึ่งที่ใช้วิเคราะห์สูตรตรรกศาสตร์"
-    )
-
-    st.markdown("### ตัวอย่าง: p ∨ ¬p")
-
-    st.write(
-        "การตรวจสอบสัจนิรันดร์เริ่มจากสมมติให้สูตรเป็นเท็จ"
-    )
-
-    st.graphviz_chart("""
-    digraph G {
-        rankdir=TB;
-
-        node [
-            shape=box,
-            style="rounded,filled",
-            fillcolor="#D8EEFF",
-            color="#245A81"
-        ];
-
-        A [label="F(p ∨ ¬p)"];
-        B [label="Fp, F¬p"];
-        C [label="Fp, Tp"];
-        D [label="× ปิดกิ่ง"];
-
-        A -> B;
-        B -> C;
-        C -> D;
-    }
-    """)
-
-    st.success(
-        "ทุกกิ่งปิด จึงสรุปว่า p ∨ ¬p เป็นสัจนิรันดร์"
-    )
-
-    st.caption(
-        "หน้านี้เป็นตัวอย่างแผนภาพต้นไม้ "
-        "ยังไม่ใช่ระบบสร้างต้นไม้จากสูตรใด ๆ โดยอัตโนมัติ"
-    )
+        except LogicError as error:
+            st.error(str(error))
 
 
-# -----------------------------------------------------
-# รวมสูตรตรรกศาสตร์
-# -----------------------------------------------------
-
-elif page == "รวมสูตร":
-
-    st.title("📖 รวมสูตรตรรกศาสตร์")
-
-    formulas = {
-
-        "กฎนิเสธ": [
-            "¬(¬p) ≡ p",
-            "p ∨ ¬p ≡ T",
-            "p ∧ ¬p ≡ F"
-        ],
-
-        "กฎของเดอมอร์แกน": [
-            "¬(p ∧ q) ≡ ¬p ∨ ¬q",
-            "¬(p ∨ q) ≡ ¬p ∧ ¬q"
-        ],
-
-        "กฎการสลับที่": [
-            "p ∧ q ≡ q ∧ p",
-            "p ∨ q ≡ q ∨ p"
-        ],
-
-        "กฎการเปลี่ยนหมู่": [
-            "(p ∧ q) ∧ r ≡ p ∧ (q ∧ r)",
-            "(p ∨ q) ∨ r ≡ p ∨ (q ∨ r)"
-        ],
-
-        "กฎการแจกแจง": [
-            "p ∧ (q ∨ r) ≡ (p ∧ q) ∨ (p ∧ r)",
-            "p ∨ (q ∧ r) ≡ (p ∨ q) ∧ (p ∨ r)"
-        ],
-
-        "กฎอิมพลิเคชัน": [
-            "p → q ≡ ¬p ∨ q",
-            "p → q ≡ ¬q → ¬p"
-        ],
-
-        "กฎสมมูลสองทาง": [
-            "p ↔ q ≡ (p → q) ∧ (q → p)"
-        ],
-
-        "กฎตัวบ่งปริมาณ": [
-            "¬(∀x P(x)) ≡ ∃x ¬P(x)",
-            "¬(∃x P(x)) ≡ ∀x ¬P(x)"
-        ]
-    }
-
-    for category, items in formulas.items():
-
-        with st.expander(category):
-
-            for formula in items:
-                st.code(formula, language=None)
-
-
-# -----------------------------------------------------
-# คำถามสำหรับแบบฝึกหัดและแบบทดสอบ
-# -----------------------------------------------------
-
-QUESTIONS = [
-
-    (
-        "T ∧ F มีค่าความจริงเป็นอะไร?",
-        ["T", "F"],
-        "F",
-        "การเชื่อมแบบและต้องจริงทั้งสองข้าง"
-    ),
-
-    (
-        "T ∨ F มีค่าความจริงเป็นอะไร?",
-        ["T", "F"],
-        "T",
-        "การเชื่อมแบบหรือเป็นจริงเมื่อมีอย่างน้อยหนึ่งข้างจริง"
-    ),
-
-    (
-        "¬T มีค่าความจริงเป็นอะไร?",
-        ["T", "F"],
-        "F",
-        "นิเสธมีค่าตรงข้ามกับประพจน์เดิม"
-    ),
-
-    (
-        "p ∨ ¬p เป็นสูตรประเภทใด?",
-        ["สัจนิรันดร์", "ข้อขัดแย้ง", "กรณีอื่น"],
-        "สัจนิรันดร์",
-        "สูตรนี้เป็นจริงทุกกรณี"
-    ),
-
-    (
-        "p ∧ ¬p เป็นสูตรประเภทใด?",
-        ["สัจนิรันดร์", "ข้อขัดแย้ง", "กรณีอื่น"],
-        "ข้อขัดแย้ง",
-        "สูตรนี้เป็นเท็จทุกกรณี"
-    ),
-
-    (
-        "T → F มีค่าความจริงเป็นอะไร?",
-        ["T", "F"],
-        "F",
-        "อิมพลิเคชันเป็นเท็จเมื่อเหตุจริงแต่ผลเท็จ"
-    )
-]
-
-
-# -----------------------------------------------------
+# ==================================================
 # แบบฝึกหัด
-# -----------------------------------------------------
+# ==================================================
 
 elif page == "แบบฝึกหัด":
+    st.title("✍️ แบบฝึกหัดตรรกศาสตร์")
 
-    st.title("📝 แบบฝึกหัดตรรกศาสตร์")
+    exercise = st.selectbox(
+        "เลือกข้อ",
+        [
+            "ข้อ 1: นิเสธ",
+            "ข้อ 2: ตัวเชื่อม AND",
+            "ข้อ 3: อิมพลิเคชัน",
+            "ข้อ 4: จำนวนแถว",
+            "ข้อ 5: สัจนิรันดร์"
+        ]
+    )
 
-    for i, question in enumerate(QUESTIONS):
-
-        text, options, correct, explanation = question
-
-        with st.container(border=True):
-
-            st.markdown(
-                f"### ข้อ {i + 1}. {text}"
-            )
-
-            answer = st.radio(
-                "เลือกคำตอบ",
-                options,
-                index=None,
-                key=f"practice_{i}"
-            )
-
-            if st.button(
-                "ตรวจคำตอบ",
-                key=f"check_{i}"
-            ):
-
-                if answer is None:
-                    st.warning("กรุณาเลือกคำตอบ")
-
-                elif answer == correct:
-                    st.success("ถูกต้อง!")
-                    st.info(explanation)
-
-                else:
-                    st.error(
-                        f"คำตอบที่ถูกคือ {correct}"
-                    )
-                    st.info(explanation)
-
-
-# -----------------------------------------------------
-# เกมตรรกศาสตร์
-# -----------------------------------------------------
-
-elif page == "เกม":
-
-    st.title("🎮 เกมทายค่าความจริง")
-
-    if "game" not in st.session_state:
-
-        st.session_state.game = (
-            random.choice([True, False]),
-            random.choice([True, False]),
-            random.choice(["AND", "OR", "IMP"])
+    exercises = {
+        "ข้อ 1: นิเสธ": (
+            "ถ้า p เป็น F แล้ว ¬p เป็นอะไร",
+            ["T", "F"],
+            "T",
+            "นิเสธมีค่าตรงข้ามกับ p"
+        ),
+        "ข้อ 2: ตัวเชื่อม AND": (
+            "T ∧ F มีค่าเท่าใด",
+            ["T", "F"],
+            "F",
+            "AND จะจริงเมื่อทั้งสองส่วนจริงเท่านั้น"
+        ),
+        "ข้อ 3: อิมพลิเคชัน": (
+            "F → F มีค่าเท่าใด",
+            ["T", "F"],
+            "T",
+            "อิมพลิเคชันเป็นเท็จเฉพาะ T → F"
+        ),
+        "ข้อ 4: จำนวนแถว": (
+            "มีตัวแปร 4 ตัว ตารางมีกี่แถว",
+            ["4", "8", "16", "32"],
+            "16",
+            "จำนวนแถวคือ 2⁴ = 16"
+        ),
+        "ข้อ 5: สัจนิรันดร์": (
+            "สูตรใดเป็นสัจนิรันดร์",
+            ["p ∧ ¬p", "p ∨ ¬p", "p ∧ q"],
+            "p ∨ ¬p",
+            "p ∨ ¬p เป็นจริงเสมอ"
         )
-
-    p, q, op = st.session_state.game
-
-    symbols = {
-        "AND": "∧",
-        "OR": "∨",
-        "IMP": "→"
     }
 
-    results = {
-        "AND": p and q,
-        "OR": p or q,
-        "IMP": (not p) or q
-    }
+    question, choices, answer, explanation = exercises[exercise]
 
-    st.markdown(
-        f"### p = {'T' if p else 'F'} "
-        f"และ q = {'T' if q else 'F'}"
+    st.subheader(question)
+
+    response = st.radio(
+        "เลือกคำตอบ",
+        choices,
+        key="exercise_response"
     )
 
-    st.markdown(
-        f"### จงหาค่าของ p {symbols[op]} q"
-    )
-
-    answer = st.radio(
-        "คำตอบ",
-        ["T", "F"],
-        index=None,
-        key="game_answer"
-    )
-
-    col1, col2 = st.columns(2)
-
-    if col1.button("ตรวจคำตอบ"):
-
-        expected = "T" if results[op] else "F"
-
-        if answer is None:
-            st.warning("กรุณาเลือกคำตอบ")
-
-        elif answer == expected:
-            st.success("ถูกต้อง!")
-
+    if st.button("ตรวจคำตอบ", type="primary"):
+        if response == answer:
+            st.success("ถูกต้อง! 🎉")
         else:
-            st.error(
-                f"คำตอบที่ถูกคือ {expected}"
-            )
+            st.error(f"คำตอบที่ถูกต้องคือ {answer}")
 
-    if col2.button("สุ่มโจทย์ใหม่"):
-
-        st.session_state.game = (
-            random.choice([True, False]),
-            random.choice([True, False]),
-            random.choice(["AND", "OR", "IMP"])
-        )
-
-        st.session_state.pop("game_answer", None)
-
-        st.rerun()
+        st.info(explanation)
 
 
-# -----------------------------------------------------
+# ==================================================
+# เกมจับคู่
+# ==================================================
+
+elif page == "เกมจับคู่":
+    st.title("🎮 เกมจับคู่ตัวดำเนินการ")
+
+    pairs = {
+        "¬": "นิเสธ",
+        "∧": "และ",
+        "∨": "หรือ",
+        "→": "ถ้า...แล้ว",
+        "↔": "ก็ต่อเมื่อ"
+    }
+
+    symbol = st.selectbox("เลือกสัญลักษณ์", list(pairs.keys()))
+
+    meaning = st.radio(
+        "เลือกความหมาย",
+        ["นิเสธ", "และ", "หรือ", "ถ้า...แล้ว", "ก็ต่อเมื่อ"]
+    )
+
+    if st.button("ตรวจคำตอบ", type="primary"):
+        if pairs[symbol] == meaning:
+            st.success("จับคู่ถูกต้อง! ⭐")
+        else:
+            st.error(f"{symbol} หมายถึง {pairs[symbol]}")
+
+
+# ==================================================
 # แบบทดสอบ
-# -----------------------------------------------------
+# ==================================================
 
 elif page == "แบบทดสอบ":
-
-    st.title("📋 แบบทดสอบตรรกศาสตร์")
+    st.title("📝 แบบทดสอบตรรกศาสตร์")
 
     answers = []
 
-    for i, question in enumerate(QUESTIONS):
-
-        text, options, correct, explanation = question
+    for index, question in enumerate(QUESTIONS):
+        st.markdown(f"**ข้อ {index + 1}. {question['question']}**")
 
         answer = st.radio(
-            f"ข้อ {i + 1}. {text}",
-            options,
-            index=None,
-            key=f"quiz_{i}"
+            "เลือกคำตอบ",
+            question["choices"],
+            key=f"quiz_{index}"
         )
 
         answers.append(answer)
 
-    if st.button("ส่งแบบทดสอบ"):
+    if st.button("ส่งคำตอบ", type="primary"):
+        score = 0
 
-        if any(answer is None for answer in answers):
+        for index, question in enumerate(QUESTIONS):
+            if answers[index] == question["answer"]:
+                score += 1
 
-            st.warning("กรุณาตอบให้ครบทุกข้อ")
+        st.metric("คะแนน", f"{score} / {len(QUESTIONS)}")
 
-        else:
+        for index, question in enumerate(QUESTIONS):
+            if answers[index] == question["answer"]:
+                st.success(f"ข้อ {index + 1}: ถูกต้อง")
+            else:
+                st.error(
+                    f"ข้อ {index + 1}: "
+                    f"คำตอบคือ {question['answer']}"
+                )
 
-            score = sum(
-                answers[i] == QUESTIONS[i][2]
-                for i in range(len(QUESTIONS))
-            )
-
-            st.metric(
-                "คะแนนที่ได้",
-                f"{score}/{len(QUESTIONS)}"
-            )
-
-            st.progress(score / len(QUESTIONS))
-
-            with st.expander("ดูเฉลย"):
-
-                for i, question in enumerate(QUESTIONS):
-
-                    st.write(
-                        f"ข้อ {i + 1}: {question[2]}"
-                    )
-
-                    st.caption(question[3])
+            st.caption(question["explanation"])
 
 
-# -----------------------------------------------------
+# ==================================================
+# ตัวอย่างต้นไม้ความจริง
+# ==================================================
+
+elif page == "ตัวอย่างต้นไม้ความจริง":
+    st.title("🌳 ตัวอย่างต้นไม้ความจริง")
+
+    st.markdown("""
+    <div class="logic-card">
+        <h3>ตัวอย่าง: p ∧ ¬p</h3>
+        <p>1. เริ่มจากสูตร p ∧ ¬p</p>
+        <p>2. ตัวเชื่อม ∧ กำหนดให้ทั้ง p และ ¬p ต้องเป็นจริง</p>
+        <p>3. จะได้ p และ ¬p อยู่ในกิ่งเดียวกัน</p>
+        <p>4. ทั้งสองข้อความขัดแย้งกัน กิ่งจึงปิด</p>
+        <h3>สรุป: p ∧ ¬p เป็นข้อขัดแย้ง</h3>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ==================================================
+# รวมสูตร
+# ==================================================
+
+elif page == "รวมสูตรตรรกศาสตร์":
+    st.title("📚 รวมสูตรตรรกศาสตร์")
+
+    formula_groups = {
+        "ตัวดำเนินการ": [
+            "¬p : นิเสธของ p",
+            "p ∧ q : p และ q",
+            "p ∨ q : p หรือ q",
+            "p → q : ถ้า p แล้ว q",
+            "p ↔ q : p ก็ต่อเมื่อ q"
+        ],
+
+        "สมมูลพื้นฐาน": [
+            "p → q ≡ ¬p ∨ q",
+            "p ↔ q ≡ (p → q) ∧ (q → p)",
+            "¬(p ∧ q) ≡ ¬p ∨ ¬q",
+            "¬(p ∨ q) ≡ ¬p ∧ ¬q"
+        ],
+
+        "กฎสำคัญ": [
+            "p ∧ T ≡ p",
+            "p ∨ F ≡ p",
+            "p ∧ F ≡ F",
+            "p ∨ T ≡ T",
+            "p ∨ ¬p ≡ T",
+            "p ∧ ¬p ≡ F"
+        ],
+
+        "กฎการอ้างเหตุผล": [
+            "Modus Ponens: p → q, p ∴ q",
+            "Modus Tollens: p → q, ¬q ∴ ¬p"
+        ]
+    }
+
+    for category, formulas in formula_groups.items():
+        with st.expander(category, expanded=True):
+            for formula in formulas:
+                st.code(formula)
+
+
+# ==================================================
 # เกี่ยวกับเว็บไซต์
-# -----------------------------------------------------
+# ==================================================
 
 elif page == "เกี่ยวกับเว็บไซต์":
-
     st.title("ℹ️ เกี่ยวกับเว็บไซต์")
 
     st.markdown("""
-    ## Math Logic Learning & Solver
-
-    เว็บไซต์สื่อการเรียนรู้ตรรกศาสตร์ทางคณิตศาสตร์
-
-    ### วัตถุประสงค์
-
-    1. เพื่อส่งเสริมการเรียนรู้เรื่องตรรกศาสตร์
-    2. เพื่อช่วยให้ผู้เรียนเข้าใจตัวเชื่อมตรรกศาสตร์
-    3. เพื่อพัฒนาทักษะการคิดอย่างมีเหตุผล
-    4. เพื่อให้ผู้เรียนฝึกสร้างตารางค่าความจริง
-    5. เพื่อให้ผู้เรียนสามารถตรวจสอบสูตรตรรกศาสตร์
-
-    ### เครื่องมือภายในเว็บไซต์
-
-    - บทเรียนและทฤษฎี
-    - เครื่องคำนวณตรรกศาสตร์
-    - ตารางค่าความจริง
-    - การตรวจสอบสูตร
-    - การตรวจสอบสมมูล
-    - การตรวจสอบการอ้างเหตุผล
-    - ตัวอย่างแผนภาพต้นไม้
-    - รวมสูตรตรรกศาสตร์
-    - แบบฝึกหัด
-    - เกมตรรกศาสตร์
-    - แบบทดสอบ
-
-    ### ข้อจำกัด
-
-    เครื่องคำนวณรองรับตรรกศาสตร์ประพจน์
-    แต่ยังไม่รองรับการคำนวณตัวบ่งปริมาณ
-    และการสร้างแผนภาพต้นไม้อัตโนมัติ
-    """)
+    <div class="logic-card">
+        <h3>Math Logic Learning & Solver</h3>
+        <p>เว็บไซต์สำหรับเรียนรู้และทบทวนตรรกศาสตร์คณิตศาสตร์</p>
+        <p><b>เครื่องมือ:</b> Python, Streamlit และ Pandas</p>
+        <p><b>ธีม:</b> Pastel Blue</p>
+        <p><b>เนื้อหา:</b> ประพจน์ ตัวดำเนินการ ตารางค่าความจริง
+        สัจนิรันดร์ ความสมมูล และการอ้างเหตุผล</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 
-# =====================================================
-# ส่วนท้ายเว็บไซต์
-# =====================================================
+# ==================================================
+# หน้าสำรอง
+# ==================================================
+
+else:
+    st.warning("ไม่พบหน้าที่เลือก กรุณาเลือกเมนูจากแถบด้านซ้าย")
 
 st.markdown("---")
-
-st.caption(
-    "🩵 Math Logic Learning & Solver | "
-    "เว็บไซต์สื่อการเรียนรู้ตรรกศาสตร์ทางคณิตศาสตร์"
-)
+st.caption("Math Logic Learning & Solver | Pastel Blue Edition")
